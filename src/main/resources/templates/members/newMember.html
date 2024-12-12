@@ -12,30 +12,6 @@
 <div th:replace="~{ fragments/nav.html::navbar }"></div>
 <form action="/member/join" method="POST"
 th:object="${memberDto}" role="form">
-<div>
-  <label>아이디</label>
-  <input type="text">
-</div>
-
-<div>
-  <label>이름</label>
-  <input type="text">
-</div>
-
-<div>
-  <label>비밀번호</label>
-  <input type="password">
-</div>
-
-<div>
-  <label>비밀 번호 확인</label>
-  <input type="password">
-</div>
-
-<div>
-  <label>이메일</label>
-  <input type="text">
-</div>
 
   <div class="form-group">
     <label th:for="loginId">아이디</label>
@@ -45,6 +21,8 @@ th:object="${memberDto}" role="form">
     <p th:errors="*{loginId}"
        th:if="${#fields.hasErrors('loginId')}">Incorrect date</p>
   </div>
+  <button type="button" id="validateLoginIdBtn">중복 확인</button>
+  <p id="loginIdError" style="color:red;"></p>
 
   <div class="form-group">
     <label th:for="username">이름</label>
@@ -67,8 +45,10 @@ th:object="${memberDto}" role="form">
     <label th:for="confirmPassword">비밀번호 확인</label>
     <input class="form-control" id="confirmPassword" placeholder="비밀번호를 다시 입력하세요" th:class="${#fields.hasErrors('passwordDto.confirmPassword')}? 'form-control
       fieldError' : 'form-control'" th:field="*{passwordDto.confirmPassword}" type="password">
+    <p id="confirmPasswordError" style="color: red;"></p>
     <p th:errors="*{passwordDto.confirmPassword}"
        th:if="${#fields.hasErrors('passwordDto.confirmPassword')}">비밀번호 확인 입력 오류</p>
+
   </div>
 
   <div class="form-group">
@@ -79,7 +59,60 @@ th:object="${memberDto}" role="form">
     <p th:errors="*{email}"
        th:if="${#fields.hasErrors('email')}">이메일 입력 오류</p>
   </div>
+  <button>가입하기</button>
 </form>
+
+
+<script>
+  document.getElementById("validateLoginIdBtn").addEventListener("click", function() {
+    var loginId = document.getElementById("loginId").value;
+    var errorMessage = document.getElementById("loginIdError");
+
+    console.log(loginId);
+    if (loginId) {
+            // Ajax 요청 보내기
+            fetch('/member/validateLoginId?loginId=' + loginId)
+                .then(response => response.json()) // JSON 응답 받기
+                .then(isValid => {
+                    if (isValid) {
+                        // 아이디가 중복되지 않으면
+                        errorMessage.textContent = "사용 가능한 아이디입니다.";
+                        errorMessage.style.color = "green"; // 성공 메시지 색상
+                    } else {
+                        // 아이디가 중복되면
+                        errorMessage.textContent = "이미 존재하는 아이디입니다.";
+                        errorMessage.style.color = "red"; // 오류 메시지 색상
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    errorMessage.textContent = "아이디 중복 확인에 실패했습니다.";
+                    errorMessage.style.color = "red"; // 오류 메시지 색상
+                });
+        } else {
+            // 아이디를 입력하지 않은 경우
+            errorMessage.textContent = "아이디를 입력해주세요.";
+            errorMessage.style.color = "red";
+        }
+    });
+</script>
+
+<script>
+  // 비밀번호 확인 이벤트 리스너
+  document.getElementById("confirmPassword").addEventListener("input", function() {
+    var password = document.getElementById("password").value;
+    var confirmPassword = document.getElementById("confirmPassword").value;
+    var errorMessage = document.getElementById("confirmPasswordError");
+
+    if (password !== confirmPassword) {
+        errorMessage.textContent = "비밀번호가 일치하지 않습니다.";
+        errorMessage.style.color = "red";
+    } else {
+        errorMessage.textContent = "비밀번호가 일치합니다.";
+        errorMessage.style.color = "green";
+    }
+  });
+</script>
 
 </body>
 </html>

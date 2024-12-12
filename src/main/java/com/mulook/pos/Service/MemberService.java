@@ -4,11 +4,12 @@ import com.mulook.pos.dto.MemberDto;
 import com.mulook.pos.entity.Member;
 import com.mulook.pos.repository.MemberRepository;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -16,8 +17,8 @@ import org.springframework.validation.FieldError;
 @RequiredArgsConstructor
 public class MemberService {
 
-    private MemberRepository memberRepository;
-    private BCryptPasswordEncoder passwordEncoder;
+    private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
 
     // 회원 가입
@@ -33,11 +34,21 @@ public class MemberService {
     }
 
     // 로그인 ID 중복 확인
-    public void validateDuplicateMemberID(MemberDto memberDto) {
-        List<Member> byLoginId = memberRepository.findByLoginId(memberDto.getLoginId());
-        if (!byLoginId.isEmpty()) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
-        }
+    // 중복 없으면 true 반환
+    // 중복 있으면 false 반환
+    @Transactional
+    public boolean validateDuplicateMemberID(String loginId) {
+        System.out.println("###########SERVICE111###########");
+        System.out.println("loginId = " + loginId);
+        System.out.println("###########SERVICE1111###########");
+
+        Optional<Member> byLoginId = memberRepository.findByLoginId(loginId);
+
+        System.out.println("###########SERVICE2222##########");
+        System.out.println("byLoginId = " + byLoginId);
+        System.out.println("###########SERVICE2222###########");
+
+        return byLoginId.isEmpty(); // 중복된 아이디가 없으면 true 반환
     }
 
 
