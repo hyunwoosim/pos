@@ -35,6 +35,9 @@ dependencies {
 
 	// mysql 연동
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// 스프링 시큐리티
+	implementation "org.springframework.boot:spring-boot-starter-security"
 }
 
 tasks.named('test') {

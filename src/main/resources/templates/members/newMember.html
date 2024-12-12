@@ -10,7 +10,8 @@
 <body>
 
 <div th:replace="~{ fragments/nav.html::navbar }"></div>
-
+<form action="/member/join" method="POST"
+th:object="${memberDto}" role="form">
 <div>
   <label>아이디</label>
   <input type="text">
@@ -36,6 +37,49 @@
   <input type="text">
 </div>
 
+  <div class="form-group">
+    <label th:for="loginId">아이디</label>
+    <input class="form-control" placeholder="아이디를 입력하세요"
+           th:class="${#fields.hasErrors('loginId')}? 'form-control fieldError' : 'form-control'"
+           th:field="*{loginId}" type="text">
+    <p th:errors="*{loginId}"
+       th:if="${#fields.hasErrors('loginId')}">Incorrect date</p>
+  </div>
+
+  <div class="form-group">
+    <label th:for="username">이름</label>
+    <input class="form-control" placeholder="이름을 입력하세요"
+           th:class="${#fields.hasErrors('username')}? 'form-control fieldError' : 'form-control'"
+           th:field="*{username}" type="text">
+    <p th:errors="*{username}"
+       th:if="${#fields.hasErrors('username')}">Incorrect date</p>
+  </div>
+
+  <div class="form-group">
+    <label th:for="password">비밀번호</label>
+    <input class="form-control" id="password" placeholder="비밀번호를 입력하세요" th:class="${#fields.hasErrors('passwordDto.password')}? 'form-control
+      fieldError' : 'form-control'" th:field="*{passwordDto.password}" type="password">
+    <p th:errors="*{passwordDto.password}" th:if="${#fields.hasErrors('passwordDto.password')}">
+      비밀번호 입력 오류</p>
+  </div>
+
+  <div class="form-group">
+    <label th:for="confirmPassword">비밀번호 확인</label>
+    <input class="form-control" id="confirmPassword" placeholder="비밀번호를 다시 입력하세요" th:class="${#fields.hasErrors('passwordDto.confirmPassword')}? 'form-control
+      fieldError' : 'form-control'" th:field="*{passwordDto.confirmPassword}" type="password">
+    <p th:errors="*{passwordDto.confirmPassword}"
+       th:if="${#fields.hasErrors('passwordDto.confirmPassword')}">비밀번호 확인 입력 오류</p>
+  </div>
+
+  <div class="form-group">
+    <label th:for="email">이메일</label>
+    <input class="form-control" placeholder="이메일을 입력하세요" th:class="${#fields.hasErrors('email')}? 'form-control
+      fieldError' : 'form-control'"
+           th:field="*{email}" type="text">
+    <p th:errors="*{email}"
+       th:if="${#fields.hasErrors('email')}">이메일 입력 오류</p>
+  </div>
+</form>
 
 </body>
 </html>
