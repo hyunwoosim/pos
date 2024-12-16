@@ -54,11 +54,23 @@ th:object="${memberDto}" role="form">
   <div class="form-group">
     <label th:for="email">이메일</label>
     <input class="form-control" placeholder="이메일을 입력하세요" th:class="${#fields.hasErrors('email')}? 'form-control
-      fieldError' : 'form-control'"
-           th:field="*{email}" type="text">
+      fieldError' : 'form-control'" th:field="*{email}" type="text" id="email">
     <p th:errors="*{email}"
        th:if="${#fields.hasErrors('email')}">이메일 입력 오류</p>
   </div>
+  <button type="button" id="verifyEmail">이메일 인증 전송</button>
+  <p id="emailTokenError" style="color:red;"></p>
+
+  <div class="form-group">
+    <label th:for="verificationCode">코드 인증</label>
+    <input  id="verificationCode" placeholder="인증 코드를 입력하세요" type="text">
+  </div>
+    <button type="button" id="verifyCodeBtn">인증 코드 확인</button>
+    <p id="verificationError" style="color:red;"></p>
+
+
+
+
   <button>가입하기</button>
 </form>
 
@@ -112,6 +124,80 @@ th:object="${memberDto}" role="form">
         errorMessage.style.color = "green";
     }
   });
+</script>
+
+<script>
+  // 이메일 인증하기
+  document.getElementById("verifyEmail").addEventListener("click", function() {
+  const email = document.getElementById("email").value;
+
+  console.log(email);
+
+    verifyEmail(email);
+    console.log(verifyEmail);
+  });
+
+  function verifyEmail(email) {
+    fetch('/send-verify-email?email=' + encodeURIComponent(email), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text(); // 성공 메시지 받기
+        } else {
+            throw new Error('실패');
+        }
+    })
+    .then(message => {
+        alert(message); // 성공 메시지 표시
+        // 인증 성공 시 UI 업데이트
+    })
+    .catch(error => {
+        const errorElement = document.getElementById("emailTokenError");
+        errorElement.textContent = error.message; // 실패 메시지 표시
+        errorElement.style.color = "red"; // 빨간색으로 표시
+    });
+}
+</script>
+
+<script>
+  // 코드 맞는지 검사
+  document.getElementById("verifyCodeBtn").addEventListener("click", function() {
+    const code = document.getElementById("verificationCode").value;
+
+    // 인증 코드가 비어있는지 확인
+    if (!code) {
+        alert("인증 코드를 입력해 주세요.");
+        return;
+    }
+
+    // AJAX 요청으로 코드 확인
+    fetch('/verify-email?code=' + encodeURIComponent(code), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text(); // 성공 메시지 받기
+        } else {
+            throw new Error('인증 코드가 잘못되었습니다.');
+        }
+    })
+    .then(message => {
+        alert(message); // 성공 메시지 표시
+        // 인증 성공 후 UI 처리 (예: 인증 완료 메시지, 폼 숨기기 등)
+    })
+    .catch(error => {
+        const errorElement = document.getElementById("verificationError");
+        errorElement.textContent = error.message; // 실패 메시지 표시
+        errorElement.style.color = "red"; // 빨간색으로 표시
+    });
+});
 </script>
 
 </body>
