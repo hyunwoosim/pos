@@ -107,7 +107,7 @@ public class MemberController {
         System.out.println("code = " + code);
         System.out.println("########## verifyEmail controller3 ########");
 
-        // 토큰과 함께 이메일 발송
+        // 코드와 함께 이메일 발송
         emailSenderService.sendVerificationEmail(email, code);
 
         return ResponseEntity.ok("전송");
