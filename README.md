@@ -23,3 +23,14 @@
 - emailSenderService.sendVerificationEmail(email, code); 이메일을 전송한다.
 - 그 후 사용자가 이메일에서 받은 코드를 가져와 
 - emailVerificationService.verifyToken(code) 유효성 검증을 한다.
+
+## 12.18
+- 아이템에서  차가운 음료, 뜨거운 음료 등등을 구분하기 위해 
+<b>@DiscriminatorColumn(name = "category")</b> 사용하였다.
+- 사용하려고 했지만 지금 당장 추가적인 컬럼이 없을꺼 같기 때문에 enum 타입을 사용해서 구분할 예정이다.
+
+- 이미지를 등록할때 처음에 디폴트 이미지가 보이고 그 다음 이미지를 등록하면 그 이미지가 나오게 할 것이다.
+- 그래서 지금 그걸 구현중이다 나중에는 S3서버를 사용해서 거기에 이미지를 저장할 예정이다.
+- 근데 지금 이미지쪽에서 오류가 발생하였다.
+1. 이미지 URL이 DB에 저장이 안됨 
+2. 파일에서 선택한 이미지가 보이지 않고 default이미지만 보이는중이다. 

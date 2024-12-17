@@ -1,6 +1,7 @@
 package com.mulook.pos.controller;
 
 import com.mulook.pos.Service.MemberService;
+import com.mulook.pos.Service.ValidateHandlingService;
 import com.mulook.pos.Service.redis.EmailSenderService;
 import com.mulook.pos.Service.redis.EmailVerificationService;
 import com.mulook.pos.dto.MemberDto;
@@ -23,6 +24,7 @@ public class MemberController {
     private final MemberService memberService;
     private final EmailVerificationService emailVerificationService;
     private final EmailSenderService emailSenderService;
+    private final ValidateHandlingService validateHandlingService;
 
 
     @GetMapping("/member/new")
@@ -45,7 +47,7 @@ public class MemberController {
 
         // 에러에 맞게 문구 나가기
         if (result.hasErrors()) {
-            Map<String, String> validatorResult = memberService.validateHandling(result);
+            Map<String, String> validatorResult = validateHandlingService.validateHandling(result);
             for (String key : validatorResult.keySet()) {
                 model.addAttribute(key, validatorResult.get(key));
             }

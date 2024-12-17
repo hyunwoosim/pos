@@ -3,15 +3,11 @@ package com.mulook.pos.Service;
 import com.mulook.pos.dto.MemberDto;
 import com.mulook.pos.entity.Member;
 import com.mulook.pos.repository.MemberRepository;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 @Service
 @RequiredArgsConstructor
@@ -52,15 +48,6 @@ public class MemberService {
     }
 
 
-    // 회원 가입 시 빈칸으로 제출 시 유효성 검사
-    public Map<String, String> validateHandling(BindingResult result) {
-        Map<String, String> validateResult = new HashMap<>();
 
-        for (FieldError error : result.getFieldErrors()) {
-            String validKeyName = String.format("valid_%s", error.getField());
-            validateResult.put(validKeyName, error.getDefaultMessage());
-        }
-        return validateResult;
-    }
 
 }
