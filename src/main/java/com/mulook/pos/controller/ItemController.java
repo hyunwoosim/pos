@@ -6,7 +6,9 @@ import com.mulook.pos.Service.aws.S3Service;
 import com.mulook.pos.dto.ItemDto;
 import com.mulook.pos.entity.ItemType;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,7 +28,6 @@ public class ItemController {
 
 
     @GetMapping("/item/new")
-
     public String createItemForm(Model model) {
         model.addAttribute("itemDto", new ItemDto());
 
@@ -61,5 +62,21 @@ public class ItemController {
         return result;
     }
 
+    @GetMapping("/item/adminMenu")
+    public String adminMenu(Model model) {
 
+        List<ItemDto> itemDto = itemService.adminMenu();
+
+        Map<ItemType, List<ItemDto>> itemTypeListMap = itemDto.stream()
+            .collect(Collectors.groupingBy(ItemDto::getItemType));
+
+        System.out.println("######## Controller-adminMenu#########");
+        System.out.println("itemTypeListMap.keySet( = " + itemTypeListMap.keySet());
+        System.out.println("itemTypeListMap.values() = " + itemTypeListMap.values());
+        System.out.println("######## Controller-adminMenu#########");
+
+        model.addAttribute("itemTypeListMap", itemTypeListMap);
+
+        return "items/adminMenu.html";
+    }
 }

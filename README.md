@@ -36,6 +36,20 @@
 1. 이미지 URL이 DB에 저장이 안됨 
 2. 파일에서 선택한 이미지가 보이지 않고 default이미지만 보이는중이다. 
 
+## 12.19
 - AWS S3에 연동하여 이미지를 저장하기로 하였다. Presigned URL을 사용하여 문제를 해결하였다. 
 - S3 서버에 이미지 파일을 저장하여 서버에 부담감을 줄였다.
-- 
+- 포스기에서 admin이 주문 받은 메뉴를 찍게 하기위해 구현하였다.
+- 일단 admin에게는 사진이 필요 없고 메뉴명과 가격만 있으면 되기 때문에 사진을 제외한 
+- ItemType,이름,가격을 가져오기 위해 새로운 Query를 만들었다. 
+- 엔티티에서 DTO로 받아서 가져온다
+- 타입별로 보고싶기 때문에 고민한 결과 MAP담아 그룹으로 보내기로 결정했다.
+```
+ List<ItemDto> itemDto = itemService.adminMenu();
+
+    Map<ItemType, List<ItemDto>> itemTypeListMap = itemDto.stream()
+        .collect(Collectors.groupingBy(ItemDto::getItemType));
+```
+- list를 스트림으로 변환하여 타입별로 그룹화 시켜서 map 담아서 보낸다.
+- 결과 아주 깔끔하고 이쁘게 나왔다.
+  - 지금은 대략적으로 CSS로 꾸몄지만 나중에 React를 사용해서 꾸밀 예정이다.

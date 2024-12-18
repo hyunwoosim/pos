@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link href="/main.css" rel="stylesheet">
+</head>
+<body>
+
+<!--<div th:replace="~{ fragments/nav.html::navbar }"></div>-->
+
+<!--  <div th:each="itemTypeListMap : ${itemTypeListMap}">-->
+<!--    <h4>-->
+<!--      <a th:text="${itemTypeListMap.key}">타입</a>-->
+<!--    </h4>-->
+
+<!--    <div class="card" th:each="value : ${itemTypeListMap.value}">-->
+<!--      <p th:text="${value.name}">이름</p>-->
+<!--      <p th:text="${value.price + '원'}"> 가격</p>-->
+<!--    </div>-->
+<!--  </div>-->
+<div th:replace="~{ fragments/nav.html::navbar }"></div>
+
+<div th:each="itemTypeListMap : ${itemTypeListMap}">
+  <h4>
+    <span th:text="${itemTypeListMap.key}">타입</span>
+  </h4>
+
+  <div class="menu-group">
+    <div class="card" th:each="value : ${itemTypeListMap.value}">
+      <div class="card-body">
+        <h5 th:text="${value.name}">이름</h5>
+        <p th:text="${value.price + '원'}">가격</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+</body>
+</html>
