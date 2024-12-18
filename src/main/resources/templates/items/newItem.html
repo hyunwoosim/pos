@@ -31,33 +31,11 @@
        th:if="${#fields.hasErrors('price')}">Incorrect date</p>
   </div>
 
-<!--  <div th:class="form-group">-->
-<!--    <label th:for="imgUrl">사진</label>-->
-<!--    &lt;!&ndash; 기본 이미지 소스 설정 &ndash;&gt;-->
-<!--    <img src="https://placehold.co/300" id="previewImg" width="200" alt="이미지 미리보기">-->
-
-<!--    &lt;!&ndash; 파일 입력 (imgUrl의 기본값은 https://placehold.co/300) &ndash;&gt;-->
-<!--    <input class="form-control"-->
-<!--           th:class="${#fields.hasErrors('imgUrl')}? 'form-control fieldError' : 'form-control'"-->
-<!--           th:field="*{imgUrl}"-->
-<!--           type="file"-->
-<!--           id="imgInput"-->
-<!--           onchange="getURL(this)">-->
-
-<!--    &lt;!&ndash; 숨겨진 필드로 이미지 URL 저장 &ndash;&gt;-->
-<!--    <input type="hidden" name="imgUrl" id="hiddenImgUrl">-->
-
-<!--    &lt;!&ndash; 에러 메시지 출력 &ndash;&gt;-->
-<!--    <p th:errors="*{imgUrl}" th:if="${#fields.hasErrors('imgUrl')}">사진을 올려주세요</p>-->
-<!--  </div>-->
-
-  <!-- 에러 메시지 출력용 (이미지 업로드 실패시) -->
-<!--  <p id="imgError" style="color: red;"></p>-->
-
+<div th:class="form-group">
   <input type="hidden" name="imgUrl"> <!-- 이미지 URL 저장용 -->
   <input type="file" onchange="getURL(this)">
   <img src="https://placehold.co/300">
-
+</div>
 
 
   <div class="form-group">

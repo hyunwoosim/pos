@@ -45,6 +45,9 @@ dependencies {
 	// 메일 보내기
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+	// AWS 연동
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
+
 
 }
 
