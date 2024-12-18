@@ -32,9 +32,14 @@ public class ItemService {
 
     public List<ItemDto> adminMenu() {
 
-
         return itemRepository.findItemWithoutImg();
     }
+
+    public List<Item> userMenu() {
+
+        return itemRepository.findAll();
+    }
+
 
 
 }

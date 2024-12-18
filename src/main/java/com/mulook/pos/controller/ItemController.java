@@ -4,11 +4,13 @@ import com.mulook.pos.Service.ItemService;
 import com.mulook.pos.Service.ValidateHandlingService;
 import com.mulook.pos.Service.aws.S3Service;
 import com.mulook.pos.dto.ItemDto;
+import com.mulook.pos.entity.Item;
 import com.mulook.pos.entity.ItemType;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,12 +53,12 @@ public class ItemController {
 
         itemService.createItem(itemDto);
 
-        return "redirect:/";
+        return "redirect:/item/userMenu";
     }
 
     @GetMapping("/presigned-url")
     @ResponseBody
-    String getURL(@RequestParam String filename) {
+    public String getURL(@RequestParam String filename) {
         String result = s3Service.createPresignedUrl("menu/" + filename);
         System.out.println("result = " + result);
         return result;
@@ -78,5 +80,18 @@ public class ItemController {
         model.addAttribute("itemTypeListMap", itemTypeListMap);
 
         return "items/adminMenu.html";
+    }
+
+    @GetMapping("/item/userMenu")
+    public String userMenu(Model model) {
+
+        List<Item> userItem = itemService.userMenu();
+
+        Map<ItemType, List<Item>> itemTypeListMap = userItem.stream()
+            .collect(Collectors.groupingBy(Item::getItemType));
+
+        model.addAttribute("itemTypeListMap", itemTypeListMap);
+
+        return "items/userMenu.html";
     }
 }

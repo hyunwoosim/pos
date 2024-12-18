@@ -10,6 +10,7 @@
 </head>
 <body>
 
+
 <div th:replace="~{ fragments/nav.html::navbar }"></div>
 
 <div th:each="itemTypeListMap : ${itemTypeListMap}">
@@ -20,15 +21,19 @@
   <div class="menu-group">
     <div class="card" th:each="value : ${itemTypeListMap.value}">
       <div class="card-body">
+        <a>
+            <img th:if="${value.imgUrl == null || value.imgUrl.isEmpty()}" src="https://placehold.co/300">
+            <img th:if="${value.imgUrl != null && !value.imgUrl.isEmpty()}" th:src="${value.imgUrl}">
+
+          <!--        <img th:if="${value.imgUrl == null || value.imgUrl.isEmpty()} " src="https://placehold.co/300">-->
+<!--        <img th:if="${value.imgUrl != null} " th:src="${value.imgUrl}">-->
+        </a>
         <h5 th:text="${value.name}">이름</h5>
         <p th:text="${value.price + '원'}">가격</p>
       </div>
     </div>
   </div>
 </div>
-
-
-
 
 </body>
 </html>

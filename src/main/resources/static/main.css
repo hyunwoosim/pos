@@ -9,7 +9,7 @@
 /* 각 카드 스타일 */
 .card {
   width: 100px;
-  height: 100px; /* 카드 높이 */
+  min-height: 180px; /* 최소 높이 설정 (이미지가 없을 때 높이 확보) */
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 15px;
@@ -21,6 +21,15 @@
   text-align: center;
 }
 
+/* 이미지 스타일 */
+.card img {
+  width: 100%; /* 이미지가 카드의 너비를 채우도록 설정 */
+  height: 70px; /* 이미지 높이를 고정 */
+  object-fit: cover; /* 이미지 비율을 유지하며 잘라서 채우기 */
+  border-radius: 8px; /* 이미지 모서리를 둥글게 */
+  margin-bottom: 10px; /* 이미지와 텍스트 간의 간격 */
+}
+
 /* 카드 내부 텍스트 스타일 */
 .card h5 {
   font-size: 18px;
@@ -30,4 +39,16 @@
 .card p {
   font-size: 16px;
   color: #888;
+}
+
+/* 카드 내부 텍스트 스타일 */
+.card h5 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 16px;
+  color: #888;
+  padding-top: 20px; /* 이미지가 없을 때 텍스트를 아래로 밀어주는 패딩 */
 }
