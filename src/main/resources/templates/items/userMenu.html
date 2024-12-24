@@ -24,16 +24,145 @@
         <a>
             <img th:if="${value.imgUrl == null || value.imgUrl.isEmpty()}" src="https://placehold.co/300">
             <img th:if="${value.imgUrl != null && !value.imgUrl.isEmpty()}" th:src="${value.imgUrl}">
-
-          <!--        <img th:if="${value.imgUrl == null || value.imgUrl.isEmpty()} " src="https://placehold.co/300">-->
-<!--        <img th:if="${value.imgUrl != null} " th:src="${value.imgUrl}">-->
         </a>
         <h5 th:text="${value.name}">이름</h5>
         <p th:text="${value.price + '원'}">가격</p>
+        <button class="add-to-order"
+                th:data-id="${value.id}"
+                th:data-name="${value.name}"
+                th:data-price="${value.price}">추가</button>
       </div>
     </div>
   </div>
 </div>
+
+
+<div>
+  <h4>주문서</h4>
+  <ul id="order-summary">
+  </ul>
+  <p>총 수량 : <span id="total-quantity">0</span></p>
+  <p>총 가격 : <span id="total-price">0</span></p>
+  <button id="submit-order">주문</button>
+</div>
+
+<script>
+  // 주문 정보를 저장할 객체
+  const orderSummary = {};
+  let totalQuantity = 0;
+  let totalPrice = 0;
+
+  // "추가" 버튼 클릭 이벤트 처리
+  document.addEventListener("click", (event) => {
+    if (event.target.classList.contains("add-to-order")) {
+      const itemId = event.target.getAttribute("data-id");
+      const itemName = event.target.getAttribute("data-name");
+      const itemPrice = parseInt(event.target.getAttribute("data-price"), 10);
+
+      // 품목이 처음 추가되는 경우
+      if (!orderSummary[itemId]) {
+        orderSummary[itemId] = { name: itemName, quantity: 1, price: itemPrice };
+      } else {
+        // 기존 품목의 수량 증가
+        orderSummary[itemId].quantity++;
+      }
+
+      // 총 수량 및 가격 계산
+      totalQuantity++;
+      totalPrice += itemPrice;
+
+      // 주문 요약 업데이트
+      updateOrderSummary();
+    }
+
+    // "취소" 버튼 클릭 이벤트 처리
+    if (event.target.classList.contains("cancel-item")) {
+      const itemId = event.target.getAttribute("data-id");
+
+      // 품목 삭제
+      const itemPrice = orderSummary[itemId].price;
+      const itemQuantity = orderSummary[itemId].quantity;
+      totalQuantity -= itemQuantity;
+      totalPrice -= itemPrice * itemQuantity;
+
+      // 주문 객체에서 품목 삭제
+      delete orderSummary[itemId];
+
+      // 주문 요약 업데이트
+      updateOrderSummary();
+    }
+  });
+
+  // 주문 요약 업데이트 함수
+  function updateOrderSummary() {
+    const orderSummaryList = document.getElementById("order-summary");
+    orderSummaryList.innerHTML = ""; // 기존 내용을 초기화
+
+    for (const itemId in orderSummary) {
+      const item = orderSummary[itemId];
+      const listItem = document.createElement("li");
+
+      // "취소" 버튼 추가
+      const cancelButton = document.createElement("button");
+      cancelButton.textContent = "취소";
+      cancelButton.classList.add("cancel-item");
+      cancelButton.setAttribute("data-id", itemId);
+
+      listItem.textContent = `${item.name} - 수량: ${item.quantity} - 가격: ${item.quantity * item.price}원 `;
+      listItem.appendChild(cancelButton);
+      orderSummaryList.appendChild(listItem);
+    }
+
+    // 총 수량 및 가격 표시
+    document.getElementById("total-quantity").textContent = totalQuantity;
+    document.getElementById("total-price").textContent = totalPrice;
+  }
+
+  // "주문" 버튼 클릭 이벤트 처리
+document.getElementById("submit-order").addEventListener("click", () => {
+  // OrderDto 형식으로 변환 (created는 클라이언트에서 보내지 않음)
+  const orderDto = {
+    memberId: 1,  // 예시로 memberId는 1로 설정, 실제로는 로그인된 사용자의 ID를 사용
+    orderItems: Object.keys(orderSummary).map(itemId => {
+      const item = orderSummary[itemId];
+      return {
+        itemId: itemId,
+<!--        name: item.name,-->
+<!--        price: item.price,-->
+        count: item.quantity,
+        totalPrice: totalPrice
+      };
+    })
+  };
+
+  // 주문 정보를 서버에 전송
+  fetch("/order/add", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(orderDto)  // JSON.stringify로 객체를 JSON 문자열로 변환하여 전송
+  })
+    .then(response => response.json())
+    .then(data => {
+    if (data.redirectUrl) {
+      console.log("######");
+        console.log(totalPrice);
+        console.log("######");
+      window.location.href = data.redirectUrl;  // 서버에서 받은 리다이렉트 URL로 이동
+    }
+
+
+    // 주문 초기화
+    for (const itemId in orderSummary) {
+      delete orderSummary[itemId];
+    }
+    totalQuantity = 0;
+    totalPrice = 0;
+    updateOrderSummary();
+  });
+  });
+</script>
 
 </body>
 </html>

@@ -113,9 +113,39 @@
   }
 
   // "주문" 버튼 클릭 이벤트 처리
-  document.getElementById("submit-order").addEventListener("click", () => {
-    alert("주문이 완료되었습니다!");
-    console.log(orderSummary); // 서버 전송 로직 추가 가능
+document.getElementById("submit-order").addEventListener("click", () => {
+  // OrderDto 형식으로 변환 (created는 클라이언트에서 보내지 않음)
+  const orderDto = {
+    memberId: 1,  // 예시로 memberId는 1로 설정, 실제로는 로그인된 사용자의 ID를 사용
+    orderItems: Object.keys(orderSummary).map(itemId => {
+      const item = orderSummary[itemId];
+      return {
+        itemId: itemId,
+<!--        name: item.name,-->
+<!--        price: item.price,-->
+        count: item.quantity,
+        totalPrice: totalPrice
+      };
+    })
+  };
+
+  // 주문 정보를 서버에 전송
+  fetch("/order/add", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(orderDto)  // JSON.stringify로 객체를 JSON 문자열로 변환하여 전송
+  })
+    .then(response => response.json())
+    .then(data => {
+    if (data.redirectUrl) {
+      console.log("######");
+        console.log(totalPrice);
+        console.log("######");
+      window.location.href = data.redirectUrl;  // 서버에서 받은 리다이렉트 URL로 이동
+    }
+
 
     // 주문 초기화
     for (const itemId in orderSummary) {
@@ -124,6 +154,7 @@
     totalQuantity = 0;
     totalPrice = 0;
     updateOrderSummary();
+  });
   });
 </script>
 

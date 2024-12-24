@@ -1,5 +1,6 @@
 package com.mulook.pos.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +18,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "orders")
 @Getter
-@Setter
 public class Order {
 
     @Id
@@ -29,7 +29,7 @@ public class Order {
    @JoinColumn(name = "member_id")
    private Member member;
 
-   @OneToMany(mappedBy = "order")
+   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     private LocalDateTime created;
