@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link href="/main.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{ fragments/nav.html::navbar }"></div>
+<div class="table-container">
+  <!-- 카드 형식으로 번호 테이블 생성 -->
+  <!-- 카드 클릭 시 admin.html?table=번호 형식으로 이동 -->
+  <div class="table-card" data-table="1">1</div>
+  <div class="table-card" data-table="2">2</div>
+  <div class="table-card" data-table="3">3</div>
+  <div class="table-card" data-table="4">4</div>
+  <div class="table-card" data-table="5">5</div>
+  <div class="table-card" data-table="6">6</div>
+  <div class="table-card" data-table="7">7</div>
+  <div class="table-card" data-table="8">8</div>
+  <div class="table-card" data-table="9">9</div>
+  <div class="table-card" data-table="10">10</div>
+</div>
+<script>
+  // 각 카드 클릭 이벤트 처리
+  document.querySelectorAll('.card-body').forEach(card => {
+      card.addEventListener('click', () => {
+          const tableNumber = card.getAttribute('data-table');
+          // 클릭한 테이블 번호를 URL에 매개변수로 전달
+          window.location.href = `admin.html?table=${tableNumber}`;
+      });
+  });
+</script>
+</body>
+</html>

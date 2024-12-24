@@ -1,14 +1,17 @@
 package com.mulook.pos.Service;
 
 import com.mulook.pos.dto.OrderDto;
+import com.mulook.pos.entity.DiningTable;
 import com.mulook.pos.entity.Item;
 import com.mulook.pos.entity.Member;
 import com.mulook.pos.entity.Order;
 import com.mulook.pos.entity.OrderItem;
+import com.mulook.pos.repository.DiningTableRepository;
 import com.mulook.pos.repository.ItemRepository;
 import com.mulook.pos.repository.MemberRepository;
 import com.mulook.pos.repository.OrderRepository;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,21 +21,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final MemberRepository memberRepository;
+    private final DiningTableRepository diningTableRepository;
     private final ItemRepository itemRepository;
 
     @Transactional
     public void orderAdd(OrderDto orderDto) {
 
-        Member member = memberRepository.findById(orderDto.getMemberId()).orElseThrow();
+        DiningTable diningTable = diningTableRepository.findById(orderDto.getDiningId()).orElseThrow();
+
 
         System.out.println("########OrderService1################");
-        System.out.println("member.getId = " + member.getId());
+
         System.out.println("########OrderService1################");
         System.out.println("       ");
 
         Order order = new Order();
-        order.addOrder(member,LocalDateTime.now());
+        order.addOrder(diningTable,LocalDateTime.now());
 
         System.out.println("########OrderService22################");
         System.out.println(" order.getCreated() = " + order.getCreated());

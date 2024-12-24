@@ -11,7 +11,7 @@ import lombok.Setter;
 public class OrderDto {
 
 
-    private Long memberId;
+    private Long diningId;
 
     private List<OrderItemDto> orderItems;
 

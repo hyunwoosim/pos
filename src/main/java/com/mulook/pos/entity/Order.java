@@ -25,9 +25,11 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
+
+
    @ManyToOne
-   @JoinColumn(name = "member_id")
-   private Member member;
+   @JoinColumn(name = "tb_id")
+   private DiningTable diningTable;
 
    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
@@ -36,8 +38,8 @@ public class Order {
 
 
     // ==  연관 관계 메서드 member 연결 == //
-    public void addOrder(Member member, LocalDateTime created) {
-        this.member = member;
+    public void addOrder(DiningTable diningTable, LocalDateTime created) {
+        this.diningTable = diningTable;
         this.created = created;
     }
 

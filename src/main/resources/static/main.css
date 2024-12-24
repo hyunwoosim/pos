@@ -52,3 +52,29 @@
   color: #888;
   padding-top: 20px; /* 이미지가 없을 때 텍스트를 아래로 밀어주는 패딩 */
 }
+
+// orderTable
+.table-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+        .table-card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100px;
+            height: 100px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .table-card:hover {
+            transform: scale(1.1);
+            background-color: #0056b3;
+        }
