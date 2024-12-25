@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link href="/main.css" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{ fragments/nav.html::navbar }"></div>
+
+<div class="table-container">
+  <div class="table-card" th:each="diningTable : ${diningTables}">
+    <h3>tableId: <span th:text="${diningTable.id}"></span></h3>
+    <h3>Dining Table Name: <a th:text="${diningTable.name}"
+                              th:attr="data-table-name=${diningTable.name}"
+                              th:href="@{/item/adminMenu/{name}(name=${diningTable.name})}"></a>
+    </h3>
+
+    <div th:each="order : ${diningTable.orders}">
+      <p>Order ID: <span th:text="${order.id}"></span></p>
+      <p>Created At: <span th:text="${order.created}"></span></p>
+
+      <ul>
+        <li th:each="orderItem : ${order.orderItems}">
+          Item: <span th:text="${orderItem.item.id}"></span> |
+          Total Price: <span th:text="${orderItem.totalPrice}"></span> |
+          Count: <span th:text="${orderItem.count}"></span>
+          ItemName: <span th:text="${orderItem.item.name}"></span> |
+          ItemPrice: <span th:text="${orderItem.item.price}"></span> |
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+   const tableCards = document.querySelectorAll('.table-card');
+
+   tableCards.forEach(card => {
+     card.addEventListener('click', function() {
+       // data-table-name 속성에서 테이블 이름을 가져옴
+       const tableName = card.querySelector('a').getAttribute('data-table-name');
+       // 해당 테이블의 메뉴 페이지로 이동
+       window.location.href = `/item/adminMenu/${tableName}`;
+     });
+   });
+ });
+</script>
+
+
+
+
+</body>
+</html>

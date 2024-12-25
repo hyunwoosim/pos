@@ -46,6 +46,9 @@
   let totalQuantity = 0;
   let totalPrice = 0;
 
+  const tableName = [[${tableName}]];
+  console.log(tableName);
+
   // "추가" 버튼 클릭 이벤트 처리
   document.addEventListener("click", (event) => {
     if (event.target.classList.contains("add-to-order")) {
@@ -116,13 +119,11 @@
 document.getElementById("submit-order").addEventListener("click", () => {
   // OrderDto 형식으로 변환 (created는 클라이언트에서 보내지 않음)
   const orderDto = {
-    diningName: 1,
+    diningName: tableName,
     orderItems: Object.keys(orderSummary).map(itemId => {
       const item = orderSummary[itemId];
       return {
         itemId: itemId,
-<!--        name: item.name,-->
-<!--        price: item.price,-->
         count: item.quantity,
         totalPrice: totalPrice
       };

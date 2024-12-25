@@ -33,20 +33,9 @@ public class OrderController {
         orderService.orderAdd(orderDto);
 
         Map<String, String> response = new HashMap<>();
-        response.put("redirectUrl", "/");
+        response.put("redirectUrl", "/orderTable");
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/orderTable")
-    public String showOrderTable(Model model) {
 
-        List<DiningTable> diningTables = orderService.allOrders();
-        System.out.println("########## controller ##############");
-        System.out.println("diningTables.toString() = " + diningTables.toString() + "\n");
-        System.out.println("########## controller ##############");
-
-        model.addAttribute("diningTables", diningTables);
-
-        return "/orders/orderTable.html";
-    }
 }

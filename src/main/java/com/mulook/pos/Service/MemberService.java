@@ -18,6 +18,7 @@ public class MemberService {
 
 
     // 회원 가입
+    @Transactional
     public void join(MemberDto memberDto) {
 
         // 비밀번호 암호화

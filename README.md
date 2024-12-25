@@ -85,6 +85,9 @@
 - 포스기에서 실제 테이블을 선택하면 해당 테이블에서 메뉴를 선택할 수 있도록 구현 중.
 - 주문이 완료되면, 해당 테이블에 메뉴명과 가격이 표시되도록 구현을 진행 중이다.
 
+### DiningTable을 분리
+- `OrderController`, `OrderService`에 기능을 구현했는데 유지보수가 편하게 `DiningController`, `DiningService`로 분리했다.
+- POS 테이블을 누르면 그 테이블 번호가 넘어가게 만들고 DB에 잘 넣어지는 것까지 확인했다.
 
 
 

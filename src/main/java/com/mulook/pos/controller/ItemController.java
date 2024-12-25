@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -64,8 +65,8 @@ public class ItemController {
         return result;
     }
 
-    @GetMapping("/item/adminMenu")
-    public String adminMenu(Model model) {
+    @GetMapping("/item/adminMenu/{name}")
+    public String adminMenu(Model model, @PathVariable int name) {
 
         List<ItemDto> itemDto = itemService.adminMenu();
 
@@ -78,6 +79,7 @@ public class ItemController {
         System.out.println("######## Controller-adminMenu#########");
 
         model.addAttribute("itemTypeListMap", itemTypeListMap);
+        model.addAttribute("tableName", name);
 
         return "items/adminMenu.html";
     }

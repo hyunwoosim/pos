@@ -63,8 +63,4 @@ public class OrderService {
     }
 
 
-    @Transactional
-    public List<DiningTable> allOrders() {
-        return diningTableRepository.findAll();
-    }
 }
