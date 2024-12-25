@@ -117,3 +117,93 @@ public class DiningTableComponent implements CommandLineRunner {
 
 - 지금은 포스기에서 실제 테이블을 누르면 메뉴를 선택할 수 있고
 - 주문하면 테이블에 메뉴와 가격이 뜨게 하려고 구현 중이다.
+
+==============================================================================
+
+
+# 포스 단말기 구현
+
+## 개요
+음식점의 포스 단말기 시스템을 구현 중입니다. 주된 기능으로는 주문, 주문 취소, 재고 수량 확인, 결제 등이 포함됩니다.
+
+## 12.13 진행 상황
+### 회원 가입 기능 완성
+- 중복 검사 및 패스워드 암호화 구현:
+  - **BCryptPasswordEncoder**를 사용하여 비밀번호 암호화.
+
+## 12.16 이메일 인증 기능 구현
+- 레디스와 SMTP 서버를 사용하여 이메일 인증 기능을 완성.
+- 6자리 랜덤 숫자 코드를 사용하여 이메일 인증 구현.
+- Ajax를 이용한 비동기 처리로 이메일 전송과 유효성 검사를 처리.
+
+### 처리 흐름
+1. 사용자가 이메일을 입력하고 전송 버튼을 클릭.
+2. `emailVerificationService.generateVerificationToken(email)`로 6자리 랜덤 코드 생성.
+3. `emailSenderService.sendVerificationEmail(email, code)`로 이메일 전송.
+4. 사용자가 받은 코드를 입력하고 `emailVerificationService.verifyToken(code)`로 유효성 검증.
+
+## 12.18 아이템 구분 및 등록
+- 아이템 카테고리를 구분하기 위해 `@DiscriminatorColumn(name = "category")` 사용.
+- 추후 추가적인 컬럼을 사용할 계획이었으나, 현재는 **enum 타입**으로 구분 예정.
+- 상품 등록 데이터는 정상적으로 들어가며, 이미지 처리에서 오류 발생:
+  - 이미지 URL이 DB에 저장되지 않음.
+  - 선택한 이미지 대신 기본 이미지만 보임.
+
+### 이미지 관련 문제 해결
+- **AWS S3** 연동하여 이미지를 저장.
+- **Presigned URL**을 사용하여 이미지 저장 문제 해결.
+
+## 12.19 메뉴 관련 기능 구현
+### Admin용 메뉴판
+- `ItemType`, 이름, 가격을 가져오는 쿼리 작성.
+- 타입별로 그룹화하여 Map으로 전달.
+- 스트림을 사용해 `groupingBy()`로 타입별 아이템 그룹화.
+
+### USER용 메뉴판
+- Admin과 동일한 방식으로 메뉴판 구현하였으며, **이미지 포함**.
+
+## 12.20 트러블슈팅 및 구현
+### Order와 Item의 관계
+- OneToMany 관계에서 DB 부하를 줄이기 위해 중계 테이블 생성 고민.
+
+### 상품 주문 UI
+- 상품을 선택하면 이름, 수량, 가격이 나타나며, 총 수량과 총 가격도 표시.
+
+## 12.24 DB 구조 개선
+- **중계 테이블 생성**: `Order`와 `Item` 사이에 `OrderItem` 테이블 추가하여 DB 부담 경감.
+- **테스트 코드 작성**: `OrderServiceTest`로 데이터 전송 확인 후 정상 작동.
+
+## 12.25 고민 사항
+### `orderItem`의 가격 칼럼에 대해 고민
+- 아이템 가격을 저장할지, 종합 가격을 저장할지 결정.
+- 종합 가격으로 저장하기로 최종 결정.
+
+### DiningTable 엔티티 추가
+- `diningTable` 엔티티를 만들어 주문과 테이블을 연결.
+- `name` 컬럼을 추가하여 1~10까지의 고정된 테이블 이름을 사용.
+
+### DiningTableComponent 로직
+- 서버 시작 시 1~10까지의 테이블 이름을 고정값으로 설정하는 로직을 추가:
+  ```java
+  @Component
+  @Transactional
+  public class DiningTableComponent implements CommandLineRunner {
+      private final DiningTableRepository diningTableRepository;
+
+      public DiningTableComponent(DiningTableRepository diningTableRepository) {
+          this.diningTableRepository = diningTableRepository;
+      }
+
+      @Override
+      public void run(String... args) throws Exception {
+          for (int i = 1; i <= 10; i++) {
+              if (!diningTableRepository.existsByName(i)) {
+                  diningTableRepository.save(new DiningTable(i));
+              }
+          }
+      }
+  }
+
+### 포스 단말기 기능 구현
+- 포스기에서 실제 테이블을 선택하면 해당 테이블에서 메뉴를 선택할 수 있도록 구현 중.
+- 주문이 완료되면, 해당 테이블에 메뉴명과 가격이 표시되도록 구현을 진행 중이다.
