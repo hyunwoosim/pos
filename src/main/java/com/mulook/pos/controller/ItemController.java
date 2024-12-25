@@ -1,9 +1,11 @@
 package com.mulook.pos.controller;
 
+import com.mulook.pos.Service.DiningTableService;
 import com.mulook.pos.Service.ItemService;
 import com.mulook.pos.Service.ValidateHandlingService;
 import com.mulook.pos.Service.aws.S3Service;
 import com.mulook.pos.dto.ItemDto;
+import com.mulook.pos.entity.DiningTable;
 import com.mulook.pos.entity.Item;
 import com.mulook.pos.entity.ItemType;
 import jakarta.validation.Valid;
@@ -28,6 +30,7 @@ public class ItemController {
     private final ItemService itemService;
     private final ValidateHandlingService validateHandlingService;
     private final S3Service s3Service;
+    private final DiningTableService diningService;
 
 
     @GetMapping("/item/new")
@@ -73,13 +76,16 @@ public class ItemController {
         Map<ItemType, List<ItemDto>> itemTypeListMap = itemDto.stream()
             .collect(Collectors.groupingBy(ItemDto::getItemType));
 
-        System.out.println("######## Controller-adminMenu#########");
-        System.out.println("itemTypeListMap.keySet( = " + itemTypeListMap.keySet());
-        System.out.println("itemTypeListMap.values() = " + itemTypeListMap.values());
-        System.out.println("######## Controller-adminMenu#########");
+        // 현재 테이블의 주문 정보
+        DiningTable currentOrder = diningService.findTableOrder(name);
+
+        System.out.println("##########Controller##################");
+        System.out.println("tableOrder.toString() = " + currentOrder.toString());
+        System.out.println("##########Controller##################");
 
         model.addAttribute("itemTypeListMap", itemTypeListMap);
         model.addAttribute("tableName", name);
+        model.addAttribute("currentOrder", currentOrder);
 
         return "items/adminMenu.html";
     }

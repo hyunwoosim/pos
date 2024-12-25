@@ -18,4 +18,8 @@ public class DiningTableService {
         return diningTableRepository.findAll();
     }
 
+    public DiningTable findTableOrder(int name) {
+       return diningTableRepository.findByName(name);
+    }
+
 }
