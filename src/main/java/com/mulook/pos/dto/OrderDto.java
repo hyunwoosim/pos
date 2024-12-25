@@ -1,6 +1,5 @@
 package com.mulook.pos.dto;
 
-import com.mulook.pos.entity.OrderItem;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
@@ -11,7 +10,7 @@ import lombok.Setter;
 public class OrderDto {
 
 
-    private Long diningId;
+    private int diningName;
 
     private List<OrderItemDto> orderItems;
 

@@ -86,3 +86,34 @@
 - 종합가격으로 넣기로 결정했다.
 
 - member테이블과 연결하는 대신 diningTable 엔티티를 만들어서 테이블과 연결하기로 결정했다.
+
+## 12.26
+- diningTable 엔티티 서버를 시작할 때 자동으로 10개의 고정 테이블을 생성하는 로직을 추가하였다.
+- 처음에 id만 있었는데 지우고 생성하면 id 값이 1부터 시작하지 않고 랜덤적으로 생성되기 때문에
+- diningTable id 로 찾을 때 문제가 생길 거 같아서 name컬럼을 추가하여 1~10까지 고정적인 값으로 만들었다.
+```
+@Component
+@Transactional
+public class DiningTableComponent implements CommandLineRunner {
+
+    private final DiningTableRepository diningTableRepository;
+
+    public DiningTableComponent(DiningTableRepository diningTableRepository) {
+        this.diningTableRepository = diningTableRepository;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        for (int i = 1; i <=10; i++) {
+            if (!diningTableRepository.existsByName(i)) {
+                diningTableRepository.save(new DiningTable(i));
+            }
+        }
+    }
+}
+```
+- 서버가 시작하면 실행되는 로직을 생성하였다. 리포지토리에서 1~10까지의 이름이 있으면 실행되고
+- 없으면 실행되지 않는다.
+
+- 지금은 포스기에서 실제 테이블을 누르면 메뉴를 선택할 수 있고
+- 주문하면 테이블에 메뉴와 가격이 뜨게 하려고 구현 중이다.

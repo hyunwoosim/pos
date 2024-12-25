@@ -2,11 +2,14 @@ package com.mulook.pos.controller;
 
 import com.mulook.pos.Service.OrderService;
 import com.mulook.pos.dto.OrderDto;
+import com.mulook.pos.entity.DiningTable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +38,15 @@ public class OrderController {
     }
 
     @GetMapping("/orderTable")
-    public String showOrderTable() {
+    public String showOrderTable(Model model) {
+
+        List<DiningTable> diningTables = orderService.allOrders();
+        System.out.println("########## controller ##############");
+        System.out.println("diningTables.toString() = " + diningTables.toString() + "\n");
+        System.out.println("########## controller ##############");
+
+        model.addAttribute("diningTables", diningTables);
+
         return "/orders/orderTable.html";
     }
 }

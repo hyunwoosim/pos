@@ -3,15 +3,13 @@ package com.mulook.pos.Service;
 import com.mulook.pos.dto.OrderDto;
 import com.mulook.pos.entity.DiningTable;
 import com.mulook.pos.entity.Item;
-import com.mulook.pos.entity.Member;
 import com.mulook.pos.entity.Order;
 import com.mulook.pos.entity.OrderItem;
 import com.mulook.pos.repository.DiningTableRepository;
 import com.mulook.pos.repository.ItemRepository;
-import com.mulook.pos.repository.MemberRepository;
 import com.mulook.pos.repository.OrderRepository;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +25,7 @@ public class OrderService {
     @Transactional
     public void orderAdd(OrderDto orderDto) {
 
-        DiningTable diningTable = diningTableRepository.findById(orderDto.getDiningId()).orElseThrow();
+        DiningTable diningTable = diningTableRepository.findByName(orderDto.getDiningName());
 
 
         System.out.println("########OrderService1################");
@@ -64,4 +62,9 @@ public class OrderService {
         orderRepository.save(order);
     }
 
+
+    @Transactional
+    public List<DiningTable> allOrders() {
+        return diningTableRepository.findAll();
+    }
 }

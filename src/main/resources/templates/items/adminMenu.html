@@ -116,7 +116,7 @@
 document.getElementById("submit-order").addEventListener("click", () => {
   // OrderDto 형식으로 변환 (created는 클라이언트에서 보내지 않음)
   const orderDto = {
-    diningId: 1,  // 예시로 diningId는 1로 설정, 실제로는 로그인된 사용자의 ID를 사용
+    diningName: 1,
     orderItems: Object.keys(orderSummary).map(itemId => {
       const item = orderSummary[itemId];
       return {

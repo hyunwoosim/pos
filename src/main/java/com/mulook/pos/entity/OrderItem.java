@@ -42,4 +42,13 @@ public class OrderItem {
 
     }
 
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+            "id=" + id +
+            ", item=" + item +
+            ", totalPrice=" + totalPrice +
+            ", count=" + count +
+            '}';
+    }
 }

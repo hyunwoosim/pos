@@ -9,6 +9,26 @@
   <link href="/main.css" rel="stylesheet">
 </head>
 <body>
+
+<div th:each="diningTable : ${diningTables}">
+  <h3>Dining Table Name: <span th:text="${diningTable.name}"></span></h3>
+
+  <div th:each="order : ${diningTable.orders}">
+    <p>Order ID: <span th:text="${order.id}"></span></p>
+    <p>Created At: <span th:text="${order.created}"></span></p>
+
+    <ul>
+      <li th:each="orderItem : ${order.orderItems}">
+        Item: <span th:text="${orderItem.item.id}"></span> |
+        Total Price: <span th:text="${orderItem.totalPrice}"></span> |
+        Count: <span th:text="${orderItem.count}"></span>
+        ItemName: <span th:text="${orderItem.item.name}"></span> |
+        ItemPrice: <span th:text="${orderItem.item.price}"></span> |
+      </li>
+    </ul>
+  </div>
+</div>
+
 <div th:replace="~{ fragments/nav.html::navbar }"></div>
 <div class="table-container">
   <!-- 카드 형식으로 번호 테이블 생성 -->

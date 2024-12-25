@@ -28,7 +28,7 @@ public class Order {
 
 
    @ManyToOne
-   @JoinColumn(name = "tb_id")
+   @JoinColumn(name = "dining_id")
    private DiningTable diningTable;
 
    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
@@ -47,5 +47,14 @@ public class Order {
     public void addOrderItem(OrderItem orderItem) {
         this.orderItems.add(orderItem);
         orderItem.linkOrder(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+            "id=" + id +
+            ", orderItems=" + orderItems +
+            ", created=" + created +
+            '}';
     }
 }
