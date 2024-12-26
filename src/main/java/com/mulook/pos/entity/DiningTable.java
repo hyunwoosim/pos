@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -23,6 +24,16 @@ public class DiningTable {
 
     @OneToMany(mappedBy = "diningTable", fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
+
+    // == 연관 관계 메서드 ==//
+    // 연관관계 메서드 추가
+    public void addOrder(Order order) {
+        this.orders.add(order);
+        order.addDining(this);
+    }
+
+
+
 
     public DiningTable() {
     }

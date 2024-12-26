@@ -34,7 +34,7 @@ public class OrderService {
         System.out.println("       ");
 
         Order order = new Order();
-        order.addOrder(diningTable,LocalDateTime.now());
+        order.addDining(diningTable);
 
         System.out.println("########OrderService22################");
         System.out.println(" order.getCreated() = " + order.getCreated());

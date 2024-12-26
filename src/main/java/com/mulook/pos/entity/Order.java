@@ -1,5 +1,6 @@
 package com.mulook.pos.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,8 +26,7 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
-
-
+    @JsonIgnore
    @ManyToOne
    @JoinColumn(name = "dining_id")
    private DiningTable diningTable;
@@ -37,10 +37,13 @@ public class Order {
     private LocalDateTime created;
 
 
-    // ==  연관 관계 메서드 member 연결 == //
-    public void addOrder(DiningTable diningTable, LocalDateTime created) {
+    // ==  연관 관계 메서드 DiningTable 연결 == //
+    public void addDining(DiningTable diningTable) {
         this.diningTable = diningTable;
-        this.created = created;
+        this.created = LocalDateTime.now();
+        if (!diningTable.getOrders().contains(this)) {
+            diningTable.getOrders().add(this);
+        }
     }
 
     // ==  연관 관계 메서드 orderItem 연결 == //
