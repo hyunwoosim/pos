@@ -1,5 +1,6 @@
 package com.mulook.pos.dto;
 
+import com.mulook.pos.entity.Item;
 import com.mulook.pos.entity.ItemType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -33,4 +34,26 @@ public class ItemDto {
         this.price = price;
         this.itemType = itemType;
     }
+
+    public ItemDto(Long id, String name, int price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+
+    public static ItemDto from(Item item) {
+        return new ItemDto(item.getId(), item.getName(), item.getPrice());
+    }
+
+    @Override
+    public String toString() {
+        return "ItemDto{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", price=" + price +
+
+            '}';
+    }
+
+
 }

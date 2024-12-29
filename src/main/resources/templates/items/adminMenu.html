@@ -40,17 +40,21 @@
      <h2> OrderId : <a th:text="${order.id}"></a> </h2>
 
       <div th:each="orderItem : ${order.orderItems}">
-        Item: <span th:text="${orderItem.item.id}"></span> |
+        Item: <span th:text="${orderItem.itemDtos.id}"></span> |
         Total Price: <span th:text="${orderItem.totalPrice}"></span> |
         Count: <span th:text="${orderItem.count}"></span>
-        ItemName: <span th:text="${orderItem.item.name}"></span> |
-        ItemPrice: <span th:text="${orderItem.item.price}"></span> |
-
+        ItemName: <span th:text="${orderItem.itemDtos.name}"></span> |
+        ItemPrice: <span th:text="${orderItem.itemDtos.price}"></span> |
       </div>
+
 
     </div>
   </div>
 </div>
+
+
+
+
 
 <div>
   <h4>주문서</h4>
@@ -66,9 +70,6 @@
   const orderSummary = {};
   let totalQuantity = 0;
   let totalPrice = 0;
-
-<!--  const currentOrderData = [[${currentTableOrder}]];-->
-<!--  console.log(currentOrderData);-->
 
   const tableName = [[${tableName}]];
   console.log(tableName);

@@ -33,4 +33,15 @@ public class Item {
         this.imgUrl = imgUrl;
         this.itemType = itemType;
     }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", price=" + price +
+            ", imgUrl='" + imgUrl + '\'' +
+            ", itemType=" + itemType +
+            '}';
+    }
 }

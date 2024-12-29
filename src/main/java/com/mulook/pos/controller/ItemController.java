@@ -4,7 +4,10 @@ import com.mulook.pos.Service.DiningTableService;
 import com.mulook.pos.Service.ItemService;
 import com.mulook.pos.Service.ValidateHandlingService;
 import com.mulook.pos.Service.aws.S3Service;
+import com.mulook.pos.dto.DiningTableDto;
 import com.mulook.pos.dto.ItemDto;
+import com.mulook.pos.dto.OrderDto;
+import com.mulook.pos.dto.OrderItemDto;
 import com.mulook.pos.entity.DiningTable;
 import com.mulook.pos.entity.Item;
 import com.mulook.pos.entity.ItemType;
@@ -15,6 +18,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -78,12 +83,12 @@ public class ItemController {
             .collect(Collectors.groupingBy(ItemDto::getItemType));
 
         // 현재 테이블의 주문 정보
-        DiningTable currentOrder = diningService.findTableOrder(name);
+        DiningTableDto currentOrder = diningService.findTableOrder(name);
 
+        System.out.println("##############Cotroller###########");
+        System.out.println("currentOrder = " + currentOrder.toString());
+        System.out.println("##############Cotroller###########");
 
-        System.out.println("##########Controller##################");
-        System.out.println("tableOrder.toString() = " + currentOrder.toString());
-        System.out.println("##########Controller##################");
 
         model.addAttribute("itemTypeListMap", itemTypeListMap);
         model.addAttribute("tableName", name);
@@ -91,6 +96,7 @@ public class ItemController {
 
         return "items/adminMenu.html";
     }
+
 
     @GetMapping("/item/userMenu")
     public String userMenu(Model model) {

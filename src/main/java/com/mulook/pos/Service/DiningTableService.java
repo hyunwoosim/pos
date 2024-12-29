@@ -1,5 +1,6 @@
 package com.mulook.pos.Service;
 
+import com.mulook.pos.dto.DiningTableDto;
 import com.mulook.pos.entity.DiningTable;
 import com.mulook.pos.repository.DiningTableRepository;
 import java.util.List;
@@ -18,9 +19,11 @@ public class DiningTableService {
         return diningTableRepository.findAll();
     }
 
-    public DiningTable findTableOrder(int name) {
+    public DiningTableDto findTableOrder(int name) {
 
-        return  diningTableRepository.findByName(name);
+        DiningTable byName = diningTableRepository.findByName(name);
+        DiningTableDto from = DiningTableDto.from(byName);
+        return  from;
     }
 
 }
