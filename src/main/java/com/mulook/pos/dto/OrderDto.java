@@ -17,6 +17,14 @@ public class OrderDto {
 
     private LocalDateTime created;
     private List<OrderItemDto> orderItems;
+    private int totalOrderPrice;
+
+    public OrderDto() {
+    }
+
+    public OrderDto(int diningName) {
+        this.diningName = diningName;
+    }
 
     public OrderDto(LocalDateTime created, List<OrderItemDto> orderItems) {
         this.created = created;
@@ -35,6 +43,14 @@ public class OrderDto {
         this.orderItems = orderItems;
     }
 
+    public OrderDto(Long id,LocalDateTime created, List<OrderItemDto> orderItems,
+        int totalOrderPrice) {
+        this.id = id;
+        this.created = created;
+        this.orderItems = orderItems;
+        this.totalOrderPrice = totalOrderPrice;
+    }
+
     @Override
     public String toString() {
         return "OrderDto{" +
@@ -45,14 +61,23 @@ public class OrderDto {
     }
 
 
-    // Order 엔티티를 OrderDto로 변환하는 from 메서드
     public static OrderDto from(Order order) {
         // Order에서 OrderItemDto 리스트를 생성
-        List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
-            .map(OrderItemDto::from)  // OrderItemDto로 변환
-            .collect(Collectors.toList());
+        List<OrderItemDto> orderItemDtos = OrderItemDto.fromList(order.getOrderItems());
+
+
+
+            // OrderItem의 총 가격 합산
+            int totalOrderPrice = orderItemDtos.stream()
+                .mapToInt(orderItemDto -> orderItemDto.getTotalPrice() * orderItemDto.getCount())
+                .sum();
+
+        System.out.println("########## OrderDTO ###############");
+        System.out.println("totalOrderPrice = " + totalOrderPrice);
+        System.out.println("########## OrderDTO ###############");
+
 
         // 변환된 데이터를 사용하여 OrderDto 객체를 생성하고 반환
-        return new OrderDto(order.getId(), order.getCreated(), orderItemDtos);
+        return new OrderDto(order.getId(), order.getCreated(), orderItemDtos, totalOrderPrice);
     }
 }

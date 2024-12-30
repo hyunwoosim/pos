@@ -31,27 +31,40 @@
     </div>
   </div>
 
-<div>
-  <div th:each="current : ${currentOrder}">
- <h2>DiningTableID : <a th:text="${current.id}"></a> </h2>
-    <h2>DiningTableName : <a th:text="${current.name}"></a> </h2>
-
-    <div th:each="order : ${current.orders} ">
-     <h2> OrderId : <a th:text="${order.id}"></a> </h2>
-
-      <div th:each="orderItem : ${order.orderItems}">
-        Item: <span th:text="${orderItem.itemDtos.id}"></span> |
-        Total Price: <span th:text="${orderItem.totalPrice}"></span> |
-        Count: <span th:text="${orderItem.count}"></span>
-        ItemName: <span th:text="${orderItem.itemDtos.name}"></span> |
-        ItemPrice: <span th:text="${orderItem.itemDtos.price}"></span> |
-      </div>
+<div th:each="current : ${currentOrder}">
+  <h2>주문테이블 아이디 : <span th:text="${current.id}"></span></h2>
+  <h2>주문테이블 번호 : <span th:text="${current.name}"></span></h2>
 
 
-    </div>
+
+  <!-- 각 Order 출력 -->
+  <div th:each="order : ${current.orders}">
+    <h4>OrderId: <span th:text="${order.id}"></span></h4>
+    <h5>Order Total Price: <span th:text="${order.totalOrderPrice}"></span></h5>
+
+    <!-- 각 OrderItem 출력 -->
+    <table>
+      <thead>
+      <tr>
+        <th>Item ID</th>
+        <th>Item Price</th>
+        <th>Total Price</th>
+        <th>Count</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="orderItem : ${order.orderItems}">
+        <td><span th:text="${orderItem.itemDtos.id}"></span></td>
+        <td><span th:text="${orderItem.itemDtos.price}"></span></td>
+        <td><span th:text="${orderItem.totalPrice}"></span></td>
+        <td><span th:text="${orderItem.count}"></span></td>
+      </tr>
+      </tbody>
+    </table>
   </div>
+  <!-- DiningTable의 총합 금액 -->
+  <h5>총합가격: <span th:text="${current.totalDiningTablePrice}"></span></h5>
 </div>
-
 
 
 
@@ -150,7 +163,7 @@ document.getElementById("submit-order").addEventListener("click", () => {
       return {
         itemId: itemId,
         count: item.quantity,
-        totalPrice: totalPrice
+        totalPrice: item.price
       };
     })
   };

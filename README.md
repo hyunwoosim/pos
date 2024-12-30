@@ -108,6 +108,102 @@
 2. 화면에 `totalPrice`를 보여주고 싶은데 `하나의 Order`에 `여러 개의 OrderItem`이 있을 수도 있어서
 - 그 데이터베이스 안에 있는 전체 `OrderItem`의 `totalPrice`를 서비스에 합쳐서 전송하려고 구현 중인데 어렵다.
 
+## 12.31
+- 서비스에서 form을 호출하면 각각의 Dto에서 데이터를 변환하여 넘겨준다.
+1. DiningTableService
+```java
+
+
+  public DiningTableDto findTableOrder(int name) {
+
+        DiningTable byName = diningTableRepository.findByName(name);
+        DiningTableDto from = DiningTableDto.from(byName);
+        return  from;
+    }
+```
+2. DiningTableDto 
+```java
+
+public static DiningTableDto from(DiningTable diningTable) {
+        List<OrderDto> orderDtos = diningTable.getOrders().stream()
+            .map(OrderDto::from)
+            .collect(Collectors.toList());
+
+        // 모든 Order의 총 금액 합산
+        int totalDiningTablePrice = orderDtos.stream()
+            .mapToInt(OrderDto::getTotalOrderPrice)
+            .sum();
+
+        System.out.println("########## DiningTableDto ###############");
+        System.out.println("totalDiningTablePrice = " + totalDiningTablePrice);
+        System.out.println("########## DiningTableDto ###############");
+
+
+        return new DiningTableDto(diningTable.getId(), diningTable.getName(), orderDtos, totalDiningTablePrice);
+    }
+```
+3. OrderDto
+```java
+    public static OrderDto from(Order order) {
+        // Order에서 OrderItemDto 리스트를 생성
+        List<OrderItemDto> orderItemDtos = OrderItemDto.fromList(order.getOrderItems());
+
+
+
+            // OrderItem의 총 가격 합산
+            int totalOrderPrice = orderItemDtos.stream()
+                .mapToInt(orderItemDto -> orderItemDto.getTotalPrice() * orderItemDto.getCount())
+                .sum();
+
+        System.out.println("########## OrderDTO ###############");
+        System.out.println("totalOrderPrice = " + totalOrderPrice);
+        System.out.println("########## OrderDTO ###############");
+
+
+        // 변환된 데이터를 사용하여 OrderDto 객체를 생성하고 반환
+        return new OrderDto(order.getId(), order.getCreated(), orderItemDtos, totalOrderPrice);
+    }
+```
+4. OrderItemDto
+```java
+
+ public static OrderItemDto from(OrderItem orderItem) {
+
+        System.out.println("########## OrderItemDto from #########");
+        System.out.println("orderItem.getItem().toString() = " + orderItem.getItem().toString());
+        System.out.println("########## OrderItemDto from #########");
+        // 단일 OrderItem을 변환
+        ItemDto itemDto = ItemDto.from(orderItem.getItem());
+        return new OrderItemDto(orderItem.getId(), orderItem.getTotalPrice(), orderItem.getCount(), itemDto);
+    }
+
+    public static List<OrderItemDto> fromList(List<OrderItem> orderItems) {
+        // OrderItem 리스트를 변환
+
+        System.out.println("########## OrderItemDto List #########");
+        System.out.println(orderItems.stream()
+                               .map(OrderItemDto::from)
+                               .collect(Collectors.toList()));
+        System.out.println("########## OrderItemDto List #########");
+        return orderItems.stream()
+            .map(OrderItemDto::from)
+            .collect(Collectors.toList());
+    }
+    // ==  테스트 코드를 위해 생성//
+    public OrderItemDto(Long itemId, int totalPrice, int count) {
+        this.itemId = itemId;
+        this.totalPrice = totalPrice;
+        this.count = count;
+    }
+```
+5. ItemDto
+```java
+  public static ItemDto from(Item item) {
+        return new ItemDto(item.getId(), item.getName(), item.getPrice());
+    }
+```
+
+
 
 
 =============================================================================

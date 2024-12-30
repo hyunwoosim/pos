@@ -16,12 +16,15 @@ public class DiningTableDto {
     private int name;
 
     private List<OrderDto> orders;
-
-//    private OrderDto orderDto;
-//    private OrderItemDto OrderItemDto;
-//    private ItemDto itemDto;
+    private int totalDiningTablePrice;
 
 
+    public DiningTableDto(Long id, int name, List<OrderDto> orders, int totalDiningTablePrice) {
+        this.id = id;
+        this.name = name;
+        this.orders = orders;
+        this.totalDiningTablePrice = totalDiningTablePrice;
+    }
 
 
 
@@ -31,15 +34,22 @@ public class DiningTableDto {
         this.orders = orders;
     }
 
-    // 엔티티(DiningTable)를 DTO(DiningTableDto)로 변환하는 from 메서드
     public static DiningTableDto from(DiningTable diningTable) {
-        // DiningTable에서 OrderDto 리스트를 생성
         List<OrderDto> orderDtos = diningTable.getOrders().stream()
-            .map(OrderDto::from)  // OrderDto로 변환
+            .map(OrderDto::from)
             .collect(Collectors.toList());
 
-        // 변환된 데이터를 사용하여 DiningTableDto 객체를 생성하고 반환
-        return new DiningTableDto(diningTable.getId(), diningTable.getName(), orderDtos);
+        // 모든 Order의 총 금액 합산
+        int totalDiningTablePrice = orderDtos.stream()
+            .mapToInt(OrderDto::getTotalOrderPrice)
+            .sum();
+
+        System.out.println("########## DiningTableDto ###############");
+        System.out.println("totalDiningTablePrice = " + totalDiningTablePrice);
+        System.out.println("########## DiningTableDto ###############");
+
+
+        return new DiningTableDto(diningTable.getId(), diningTable.getName(), orderDtos, totalDiningTablePrice);
     }
 
     @Override

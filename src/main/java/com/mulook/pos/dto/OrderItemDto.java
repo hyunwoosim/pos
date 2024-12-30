@@ -3,6 +3,7 @@ package com.mulook.pos.dto;
 import com.mulook.pos.entity.Item;
 import com.mulook.pos.entity.OrderItem;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +20,9 @@ public class OrderItemDto {
 
     private ItemDto itemDtos;
 
+    public OrderItemDto() {
+    }
+
     public OrderItemDto(Long itemId, int totalPrice, int count, ItemDto itemDtos) {
         this.itemId = itemId;
         this.totalPrice = totalPrice;
@@ -26,16 +30,28 @@ public class OrderItemDto {
         this.itemDtos = itemDtos;
     }
 
-
-    // OrderItem 엔티티를 OrderItemDto로 변환하는 from 메서드
     public static OrderItemDto from(OrderItem orderItem) {
-        // Item 엔티티를 ItemDto로 변환
-        ItemDto itemDto = ItemDto.from(orderItem.getItem());
 
-        // 변환된 데이터를 사용하여 OrderItemDto 객체를 생성하고 반환
+        System.out.println("########## OrderItemDto from #########");
+        System.out.println("orderItem.getItem().toString() = " + orderItem.getItem().toString());
+        System.out.println("########## OrderItemDto from #########");
+        // 단일 OrderItem을 변환
+        ItemDto itemDto = ItemDto.from(orderItem.getItem());
         return new OrderItemDto(orderItem.getId(), orderItem.getTotalPrice(), orderItem.getCount(), itemDto);
     }
 
+    public static List<OrderItemDto> fromList(List<OrderItem> orderItems) {
+        // OrderItem 리스트를 변환
+
+        System.out.println("########## OrderItemDto List #########");
+        System.out.println(orderItems.stream()
+                               .map(OrderItemDto::from)
+                               .collect(Collectors.toList()));
+        System.out.println("########## OrderItemDto List #########");
+        return orderItems.stream()
+            .map(OrderItemDto::from)
+            .collect(Collectors.toList());
+    }
     // ==  테스트 코드를 위해 생성//
     public OrderItemDto(Long itemId, int totalPrice, int count) {
         this.itemId = itemId;
