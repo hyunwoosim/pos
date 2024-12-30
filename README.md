@@ -202,8 +202,8 @@ public static DiningTableDto from(DiningTable diningTable) {
         return new ItemDto(item.getId(), item.getName(), item.getPrice());
     }
 ```
-
-
+![Image description](./READMEimages/종합가격 구현한 스크린샷.png)
+- 구현단계이기 때문에 모든 데이터를 표시하고 있다.
 
 
 =============================================================================
