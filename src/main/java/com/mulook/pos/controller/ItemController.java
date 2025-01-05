@@ -90,9 +90,11 @@ public class ItemController {
         System.out.println("##############Cotroller###########");
 
 
+
         model.addAttribute("itemTypeListMap", itemTypeListMap);
         model.addAttribute("tableName", name);
         model.addAttribute("currentOrder", currentOrder);
+        model.addAttribute("getTotalDiningTablePrice", currentOrder.getTotalDiningTablePrice());
 
         return "items/adminMenu.html";
     }

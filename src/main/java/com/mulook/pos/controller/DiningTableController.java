@@ -20,6 +20,7 @@ private final DiningTableService diningService;
 
         List<DiningTable> diningTables = diningService.allTableOrder();
 
+
         model.addAttribute("diningTables", diningTables);
 
         return "/diningTables/orderTable.html";

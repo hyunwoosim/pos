@@ -127,8 +127,6 @@ document.getElementById("submit-order").addEventListener("click", () => {
       const item = orderSummary[itemId];
       return {
         itemId: itemId,
-<!--        name: item.name,-->
-<!--        price: item.price,-->
         count: item.quantity,
         totalPrice: totalPrice
       };

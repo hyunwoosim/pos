@@ -44,6 +44,11 @@ public class OrderItem {
 
     }
 
+    public void updateOrderItem(int totalPrice, int count) {
+        this.totalPrice = totalPrice;
+        this.count = count;
+    }
+
     @Override
     public String toString() {
         return "OrderItem{" +
@@ -53,4 +58,5 @@ public class OrderItem {
             ", count=" + count +
             '}';
     }
+
 }

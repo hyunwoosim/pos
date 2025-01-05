@@ -18,6 +18,8 @@ public class DiningTableDto {
     private List<OrderDto> orders;
     private int totalDiningTablePrice;
 
+    public DiningTableDto() {
+    }
 
     public DiningTableDto(Long id, int name, List<OrderDto> orders, int totalDiningTablePrice) {
         this.id = id;
@@ -34,23 +36,26 @@ public class DiningTableDto {
         this.orders = orders;
     }
 
-    public static DiningTableDto from(DiningTable diningTable) {
-        List<OrderDto> orderDtos = diningTable.getOrders().stream()
-            .map(OrderDto::from)
-            .collect(Collectors.toList());
 
-        // 모든 Order의 총 금액 합산
-        int totalDiningTablePrice = orderDtos.stream()
-            .mapToInt(OrderDto::getTotalOrderPrice)
-            .sum();
+//
+//    public static DiningTableDto from(DiningTable diningTable) {
+//        List<OrderDto> orderDtos = diningTable.getOrders().stream()
+//            .map(OrderDto::from)
+//            .collect(Collectors.toList());
+//
+//        // 모든 Order의 총 금액 합산
+//        int totalDiningTablePrice = orderDtos.stream()
+//            .mapToInt(OrderDto::getTotalOrderPrice)
+//            .sum();
+//
+//        System.out.println("########## DiningTableDto ###############");
+//        System.out.println("totalDiningTablePrice = " + totalDiningTablePrice);
+//        System.out.println("########## DiningTableDto ###############");
+//
+//
+//        return new DiningTableDto(diningTable.getId(), diningTable.getName(), orderDtos, totalDiningTablePrice);
+//    }
 
-        System.out.println("########## DiningTableDto ###############");
-        System.out.println("totalDiningTablePrice = " + totalDiningTablePrice);
-        System.out.println("########## DiningTableDto ###############");
-
-
-        return new DiningTableDto(diningTable.getId(), diningTable.getName(), orderDtos, totalDiningTablePrice);
-    }
 
     @Override
     public String toString() {
@@ -58,7 +63,6 @@ public class DiningTableDto {
             "id=" + id +
             ", name=" + name +
             ", orders=" + orders +
-
             '}';
     }
 }

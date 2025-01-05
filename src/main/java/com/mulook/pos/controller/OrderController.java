@@ -24,10 +24,16 @@ public class OrderController {
     public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderDto) {
 
         orderDto.getOrderItems().forEach(orderItem -> {
+            System.out.println("#############OrderController11#############");
+            System.out.println("orderItem.getOrderId() = " + orderItem.getOrderId());
+            System.out.println("orderItem.getOrderItemId() = " + orderItem.getOrderItemId());
             System.out.println("Item ID: " + orderItem.getItemId());
             System.out.println("Count: " + orderItem.getCount());
             System.out.println("Total Price: " + orderItem.getTotalPrice());
+            System.out.println("#############OrderController11#############");
+            orderDto.setId(orderItem.getOrderId());
         });
+
 
 
         orderService.orderAdd(orderDto);

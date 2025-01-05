@@ -203,7 +203,117 @@ public static DiningTableDto from(DiningTable diningTable) {
     }
 ```
 <img src="READMEImages/종합가격 구현한 스크린샷.png">
-- 구현단계이기 때문에 모든 데이터를 표시하고 있다.
+
+### 구현단계이기 때문에 모든 데이터를 표시하고 있다.
+
+
+## 1.6
+- 폼에서 호출하던 걸 다 갈아엎었다.
+```java
+public DiningTableDto findTableOrder(int name) {
+
+        DiningTable byName = diningTableRepository.findByName(name);
+
+        DiningTableDto diningTableDto = new DiningTableDto();
+        diningTableDto.setId(byName.getId());
+        diningTableDto.setName(byName.getName());
+
+        List<OrderDto> orders = byName.getOrders().stream()
+                .map(order ->{
+                    OrderDto orderDtos = new OrderDto();
+                    orderDtos.setId(order.getId());
+                    System.out.println("###############DiningTableService################");
+                    System.out.println("orderDtos.getId() = " + orderDtos.getId());
+                    System.out.println("###############DiningTableService################");
+
+                List<OrderItemDto> items = order.getOrderItems().stream()
+                    .map(item -> new OrderItemDto(
+                        item.getId(),
+                        item.getItem().getId(),
+                        item.getOrder().getId(),
+                        item.getItem().getName(),
+                        item.getItem().getPrice(),
+                        item.getCount()
+                    ))
+                    .collect(Collectors.toList());
+                    orderDtos.setOrderItems(items);
+
+
+
+                    return orderDtos;
+
+                })
+            .collect(Collectors.toList());
+        diningTableDto.setOrders(orders);
+        return diningTableDto;
+```
+- 스트림을 사용하여 필요한 데이터들을 넣어서 model에 담아서 전달하였다.
+- 그렇게 하여 주문서에 한 번에 뜨게 만들었다
+- 그리고 주문 버튼 하나로 주문, 업데이트가 가능하게 만들었다.
+```java
+
+ @Transactional
+    public void orderAdd(OrderDto orderDto) {
+        // orderId가 존재하면 기존 주문을 업데이트, 없으면 새로운 주문을 생성
+        Order order = null;
+
+        System.out.println("#######OrderService 11 #######");
+        System.out.println("orderDto = " + orderDto.getId());
+        System.out.println("#######OrderService 11 #######");
+
+        if (orderDto.getId() != null) {
+
+            System.out.println("#######OrderService 22 #######");
+            System.out.println("orderDto = " + orderDto.getId());
+            System.out.println("#######OrderService 22 #######");
+
+            // 기존 주문이 있을 경우, orderId로 주문을 찾아서 업데이트
+            order = orderRepository.findById(orderDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+            // 기존 주문을 업데이트
+            updateExistingOrder(order, orderDto);
+        } else {
+
+            System.out.println("#######OrderService 33 #######");
+            System.out.println("orderDto = " + orderDto.getId());
+            System.out.println("#######OrderService 33 #######");
+            // 새로운 주문이면 새로운 주문 생성
+            DiningTable diningTable = diningTableRepository.findByName(orderDto.getDiningName());
+            order = new Order();
+            order.addDining(diningTable);
+
+            // 새로운 주문 항목 추가
+            Order finalOrder = order;
+            orderDto.getOrderItems().forEach(orderItemDto -> {
+                Item item = itemRepository.findById(orderItemDto.getItemId()).orElseThrow();
+                OrderItem orderItem = new OrderItem();
+                orderItem.addOrderItem(item, orderItemDto.getTotalPrice(), orderItemDto.getCount());
+                finalOrder.addOrderItem(orderItem);
+            });
+
+            // 새로운 주문 저장
+            orderRepository.save(order);
+        }
+    }
+```
+- orderId로 새로운 주문인지 기존의 주문인지 유효성 검사를 하였고
+- order에는 여러 개의 OrderItem이 있는 경우가 있을 수 있음으로
+- 업데이트는 OrderItemId를 기준으로 업데이트하였다.
+
+
+<img src="READMEImages/주문업데이트 구현.png">
+
+
+
+
+
+
+
+
+
+
+
 
 
 =============================================================================
