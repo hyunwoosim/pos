@@ -8,6 +8,7 @@ import com.mulook.pos.entity.Order;
 import com.mulook.pos.entity.OrderItem;
 import com.mulook.pos.repository.DiningTableRepository;
 import com.mulook.pos.repository.ItemRepository;
+import com.mulook.pos.repository.OrderItemRepository;
 import com.mulook.pos.repository.OrderRepository;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,91 +26,59 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final DiningTableRepository diningTableRepository;
     private final ItemRepository itemRepository;
-
-//    @Transactional
-//    public void orderAdd(OrderDto orderDto) {
-//
-//        DiningTable diningTable = diningTableRepository.findByName(orderDto.getDiningName());
-//
-//        Order order = new Order();
-//        order.addDining(diningTable);
-//
-//        orderDto.getOrderItems().forEach(orderItemDto -> {
-//            Item item = itemRepository.findById(orderItemDto.getItemId()).orElseThrow();
-//
-//            OrderItem orderItem = new OrderItem();
-//            orderItem.addOrderItem(item, orderItemDto.getTotalPrice(),orderItemDto.getCount());
-//
-//            order.addOrderItem(orderItem);
-//        });
-//
-//        orderRepository.save(order);
-//    }
+    private final OrderItemRepository orderItemRepository;
 
     @Transactional
-    public void orderAdd(OrderDto orderDto) {
-        // orderId가 존재하면 기존 주문을 업데이트, 없으면 새로운 주문을 생성
-        Order order = null;
+    public void orderAdd(OrderDto orderDto, List<OrderItemDto> addItems) {
 
-        System.out.println("#######OrderService 11 #######");
+        System.out.println("####### orderAdd #######");
         System.out.println("orderDto = " + orderDto.getId());
-        System.out.println("#######OrderService 11 #######");
+        System.out.println("####### orderAdd #######");
 
-        if (orderDto.getId() != null) {
+        DiningTable diningTable = diningTableRepository.findByName(orderDto.getDiningName());
 
-            System.out.println("#######OrderService 22 #######");
-            System.out.println("orderDto = " + orderDto.getId());
-            System.out.println("#######OrderService 22 #######");
+        Order order = new Order();
+        order.addDining(diningTable);
 
-            // 기존 주문이 있을 경우, orderId로 주문을 찾아서 업데이트
-            order = orderRepository.findById(orderDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+        addItems.forEach(orderItemDto -> {
+            Item item = itemRepository.findById(orderItemDto.getItemId()).orElseThrow();
 
-            // 기존 주문을 업데이트
-            updateExistingOrder(order, orderDto);
-        } else {
+            OrderItem orderItem = new OrderItem();
+            orderItem.addOrderItem(item, orderItemDto.getTotalPrice(),orderItemDto.getCount());
 
-            System.out.println("#######OrderService 33 #######");
-            System.out.println("orderDto = " + orderDto.getId());
-            System.out.println("#######OrderService 33 #######");
-            // 새로운 주문이면 새로운 주문 생성
-            DiningTable diningTable = diningTableRepository.findByName(orderDto.getDiningName());
-            order = new Order();
-            order.addDining(diningTable);
+            order.addOrderItem(orderItem);
+        });
 
-            // 새로운 주문 항목 추가
-            Order finalOrder = order;
-            orderDto.getOrderItems().forEach(orderItemDto -> {
-                Item item = itemRepository.findById(orderItemDto.getItemId()).orElseThrow();
-                OrderItem orderItem = new OrderItem();
-                orderItem.addOrderItem(item, orderItemDto.getTotalPrice(), orderItemDto.getCount());
-                finalOrder.addOrderItem(orderItem);
-            });
-
-            // 새로운 주문 저장
-            orderRepository.save(order);
-        }
+        orderRepository.save(order);
     }
 
-    private void updateExistingOrder(Order existingOrder, OrderDto orderDto) {
-
-            // 1. 기존 주문 항목을 Map으로 변환 (orderItemId를 Key로 사용)
-            Map<Long, OrderItem> existingOrderItemMap = existingOrder.getOrderItems().stream()
-                .collect(Collectors.toMap(OrderItem::getId, orderItem -> orderItem));
-
-            // 2. 새로운 데이터의 orderItemId를 기준으로 기존 항목 수정
-            orderDto.getOrderItems().forEach(orderItemDto -> {
-                OrderItem existingOrderItem = existingOrderItemMap.get(orderItemDto.getOrderItemId());
-                if (existingOrderItem != null) {
-                    // 기존 OrderItem의 변경 감지를 트리거하기 위해 값 설정
-                    existingOrderItem.updateOrderItem(orderItemDto.getTotalPrice(), orderItemDto.getCount());
-                }
-            });
+    @Transactional
+    public void orderUpdate(OrderDto orderDto, List<OrderItemDto> updateItems) {
 
 
-        // 기존 주문을 저장하여 업데이트 (변경 감지)
-        orderRepository.save(existingOrder);
+        System.out.println("####### orderUpdate #######");
+        System.out.println("orderDto = " + orderDto.getId());
+        System.out.println("####### orderUpdate #######");
+
+        // 1. 업데이트 항목에 해당하는 orderItemId들을 기준으로 각 항목을 업데이트
+        updateItems.forEach(orderItemDto -> {
+            // updateItems에서 각 항목을 순차적으로 처리
+            OrderItem existingOrderItem = orderItemRepository.findById(orderItemDto.getOrderItemId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문 항목입니다."));
+
+            // 기존 OrderItem의 변경 감지를 트리거하기 위해 값 설정
+            existingOrderItem.updateOrderItem(orderItemDto.getTotalPrice(), orderItemDto.getCount());
+
+            // 해당 OrderItem을 포함하는 Order를 찾아서 변경된 값을 반영
+            Order order = existingOrderItem.getOrder();
+
+            System.out.println("####### orderUpdate22 #######");
+            System.out.println("order = " + order);
+            System.out.println("####### orderUpdate 22#######");
+
+            orderRepository.save(order);  // 변경된 주문을 저장 (변경 감지)
+        });
+
     }
-
 
 }

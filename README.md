@@ -111,97 +111,97 @@
 ## 12.31
 - 서비스에서 form을 호출하면 각각의 Dto에서 데이터를 변환하여 넘겨준다.
 1. DiningTableService
-```java
-
-
-  public DiningTableDto findTableOrder(int name) {
-
-        DiningTable byName = diningTableRepository.findByName(name);
-        DiningTableDto from = DiningTableDto.from(byName);
-        return  from;
-    }
-```
+    ```java
+    
+    
+      public DiningTableDto findTableOrder(int name) {
+    
+            DiningTable byName = diningTableRepository.findByName(name);
+            DiningTableDto from = DiningTableDto.from(byName);
+            return  from;
+        }
+    ```
 2. DiningTableDto 
-```java
-
-public static DiningTableDto from(DiningTable diningTable) {
-        List<OrderDto> orderDtos = diningTable.getOrders().stream()
-            .map(OrderDto::from)
-            .collect(Collectors.toList());
-
-        // 모든 Order의 총 금액 합산
-        int totalDiningTablePrice = orderDtos.stream()
-            .mapToInt(OrderDto::getTotalOrderPrice)
-            .sum();
-
-        System.out.println("########## DiningTableDto ###############");
-        System.out.println("totalDiningTablePrice = " + totalDiningTablePrice);
-        System.out.println("########## DiningTableDto ###############");
-
-
-        return new DiningTableDto(diningTable.getId(), diningTable.getName(), orderDtos, totalDiningTablePrice);
-    }
-```
-3. OrderDto
-```java
-    public static OrderDto from(Order order) {
-        // Order에서 OrderItemDto 리스트를 생성
-        List<OrderItemDto> orderItemDtos = OrderItemDto.fromList(order.getOrderItems());
-
-
-
-            // OrderItem의 총 가격 합산
-            int totalOrderPrice = orderItemDtos.stream()
-                .mapToInt(orderItemDto -> orderItemDto.getTotalPrice() * orderItemDto.getCount())
+    ```java
+    
+    public static DiningTableDto from(DiningTable diningTable) {
+            List<OrderDto> orderDtos = diningTable.getOrders().stream()
+                .map(OrderDto::from)
+                .collect(Collectors.toList());
+    
+            // 모든 Order의 총 금액 합산
+            int totalDiningTablePrice = orderDtos.stream()
+                .mapToInt(OrderDto::getTotalOrderPrice)
                 .sum();
-
-        System.out.println("########## OrderDTO ###############");
-        System.out.println("totalOrderPrice = " + totalOrderPrice);
-        System.out.println("########## OrderDTO ###############");
-
-
-        // 변환된 데이터를 사용하여 OrderDto 객체를 생성하고 반환
-        return new OrderDto(order.getId(), order.getCreated(), orderItemDtos, totalOrderPrice);
-    }
-```
+    
+            System.out.println("########## DiningTableDto ###############");
+            System.out.println("totalDiningTablePrice = " + totalDiningTablePrice);
+            System.out.println("########## DiningTableDto ###############");
+    
+    
+            return new DiningTableDto(diningTable.getId(), diningTable.getName(), orderDtos, totalDiningTablePrice);
+        }
+    ```
+3. OrderDto
+    ```java
+        public static OrderDto from(Order order) {
+            // Order에서 OrderItemDto 리스트를 생성
+            List<OrderItemDto> orderItemDtos = OrderItemDto.fromList(order.getOrderItems());
+    
+    
+    
+                // OrderItem의 총 가격 합산
+                int totalOrderPrice = orderItemDtos.stream()
+                    .mapToInt(orderItemDto -> orderItemDto.getTotalPrice() * orderItemDto.getCount())
+                    .sum();
+    
+            System.out.println("########## OrderDTO ###############");
+            System.out.println("totalOrderPrice = " + totalOrderPrice);
+            System.out.println("########## OrderDTO ###############");
+    
+    
+            // 변환된 데이터를 사용하여 OrderDto 객체를 생성하고 반환
+            return new OrderDto(order.getId(), order.getCreated(), orderItemDtos, totalOrderPrice);
+        }
+    ```
 4. OrderItemDto
-```java
-
- public static OrderItemDto from(OrderItem orderItem) {
-
-        System.out.println("########## OrderItemDto from #########");
-        System.out.println("orderItem.getItem().toString() = " + orderItem.getItem().toString());
-        System.out.println("########## OrderItemDto from #########");
-        // 단일 OrderItem을 변환
-        ItemDto itemDto = ItemDto.from(orderItem.getItem());
-        return new OrderItemDto(orderItem.getId(), orderItem.getTotalPrice(), orderItem.getCount(), itemDto);
-    }
-
-    public static List<OrderItemDto> fromList(List<OrderItem> orderItems) {
-        // OrderItem 리스트를 변환
-
-        System.out.println("########## OrderItemDto List #########");
-        System.out.println(orderItems.stream()
-                               .map(OrderItemDto::from)
-                               .collect(Collectors.toList()));
-        System.out.println("########## OrderItemDto List #########");
-        return orderItems.stream()
-            .map(OrderItemDto::from)
-            .collect(Collectors.toList());
-    }
-    // ==  테스트 코드를 위해 생성//
-    public OrderItemDto(Long itemId, int totalPrice, int count) {
-        this.itemId = itemId;
-        this.totalPrice = totalPrice;
-        this.count = count;
-    }
-```
+    ```java
+    
+     public static OrderItemDto from(OrderItem orderItem) {
+    
+            System.out.println("########## OrderItemDto from #########");
+            System.out.println("orderItem.getItem().toString() = " + orderItem.getItem().toString());
+            System.out.println("########## OrderItemDto from #########");
+            // 단일 OrderItem을 변환
+            ItemDto itemDto = ItemDto.from(orderItem.getItem());
+            return new OrderItemDto(orderItem.getId(), orderItem.getTotalPrice(), orderItem.getCount(), itemDto);
+        }
+    
+        public static List<OrderItemDto> fromList(List<OrderItem> orderItems) {
+            // OrderItem 리스트를 변환
+    
+            System.out.println("########## OrderItemDto List #########");
+            System.out.println(orderItems.stream()
+                                   .map(OrderItemDto::from)
+                                   .collect(Collectors.toList()));
+            System.out.println("########## OrderItemDto List #########");
+            return orderItems.stream()
+                .map(OrderItemDto::from)
+                .collect(Collectors.toList());
+        }
+        // ==  테스트 코드를 위해 생성//
+        public OrderItemDto(Long itemId, int totalPrice, int count) {
+            this.itemId = itemId;
+            this.totalPrice = totalPrice;
+            this.count = count;
+        }
+    ```
 5. ItemDto
-```java
-  public static ItemDto from(Item item) {
-        return new ItemDto(item.getId(), item.getName(), item.getPrice());
-    }
-```
+    ```java
+      public static ItemDto from(Item item) {
+            return new ItemDto(item.getId(), item.getName(), item.getPrice());
+        }
+    ```
 <img src="READMEImages/종합가격 구현한 스크린샷.png">
 
 ### 구현단계이기 때문에 모든 데이터를 표시하고 있다.
@@ -303,3 +303,83 @@ public DiningTableDto findTableOrder(int name) {
 
 
 <img src="READMEImages/주문업데이트 구현.png">
+
+## 1.7
+### 오류 발견
+- order 수정중 하던 도중 기존 주문에 수정과 새로운 주문을 같이 했을때 
+- 기존 주문이 새로운 주문으로 함께 입력되는 중복으로 주문 되는 오류가 발생하였다.
+- orderId기준으로 기존 주문과 새로운 주문으로 유효성검사를 하였는데
+- 밑에 처럼 넘어 오기 때문에 무조건 새로운 주문으로 되는 중 있었다.
+```java
+디티오OrderDto{id=null, diningName=3, created=null, orderItems=[
+    OrderItemDto{orderItemId=1702, itemId=52, orderId=1752, totalPrice=9000, count=1, name='null', price=0, itemDtos=null}, 
+  OrderItemDto{orderItemId=1703, itemId=102, orderId=1752, totalPrice=10000, count=2, name='null', price=0, itemDtos=null}, 
+  OrderItemDto{orderItemId=1704, itemId=202, orderId=1752, totalPrice=1000, count=8, name='null', price=0, itemDtos=null}, 
+  OrderItemDto{orderItemId=null, itemId=252, orderId=null, totalPrice=7000, count=5, name='null', price=0, itemDtos=null}]}
+```
+### 해결
+1. add, update 분리
+2. 컨트롤러에서 list로 만들어 null값을 기준으로 새로운 주문과 기존 주문을 구분하였다.
+    ```java
+     public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderDto) {
+        List<OrderItemDto> addItems = new ArrayList<>();
+        List<OrderItemDto> updateItems = new ArrayList<>();
+    
+        // orderDto의 orderItems를 순회하여 분리
+        for (OrderItemDto orderItem : orderDto.getOrderItems()) {
+            if (orderItem.getOrderId() == null) {
+                addItems.add(orderItem);  // orderId가 null인 항목은 추가
+            } else {
+                updateItems.add(orderItem);  // orderId가 null이 아닌 항목은 업데이트
+            }
+          // 분리된 addItems와 updateItems를 각각 처리
+          if (!addItems.isEmpty()) {
+    
+            // 새로운 주문 항목을 추가하는 서비스 호출
+            orderService.orderAdd(orderDto, addItems);
+          }
+    
+          if (!updateItems.isEmpty()) {
+    
+            // 기존 주문 항목을 업데이트하는 서비스 호출
+            orderService.orderUpdate(orderDto, updateItems);
+          }
+    
+          Map<String, String> response = new HashMap<>();
+          response.put("redirectUrl", "/orderTable");
+          return ResponseEntity.ok(response);
+        }
+    
+    }
+    ```
+3. list를 활용하여 orderItemId를 기준으로 업데이트 한 후 order를 호출하여 변경하였다.
+    ```java
+       @Transactional
+        public void orderUpdate(OrderDto orderDto, List<OrderItemDto> updateItems) {
+    
+    
+            System.out.println("####### orderUpdate #######");
+            System.out.println("orderDto = " + orderDto.getId());
+            System.out.println("####### orderUpdate #######");
+    
+            // 1. 업데이트 항목에 해당하는 orderItemId들을 기준으로 각 항목을 업데이트
+            updateItems.forEach(orderItemDto -> {
+                // updateItems에서 각 항목을 순차적으로 처리
+                OrderItem existingOrderItem = orderItemRepository.findById(orderItemDto.getOrderItemId())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문 항목입니다."));
+    
+                // 기존 OrderItem의 변경 감지를 트리거하기 위해 값 설정
+                existingOrderItem.updateOrderItem(orderItemDto.getTotalPrice(), orderItemDto.getCount());
+    
+                // 해당 OrderItem을 포함하는 Order를 찾아서 변경된 값을 반영
+                Order order = existingOrderItem.getOrder();
+    
+                System.out.println("####### orderUpdate22 #######");
+                System.out.println("order = " + order);
+                System.out.println("####### orderUpdate 22#######");
+    
+                orderRepository.save(order);  // 변경된 주문을 저장 (변경 감지)
+            });
+    
+        }
+    ```
