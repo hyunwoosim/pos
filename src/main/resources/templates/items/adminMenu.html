@@ -84,6 +84,7 @@
   let totalQuantity = 0;
   let totalPrice = 0;
   const cancelOrderItemId = [];
+  const cancelOrderId = {};
 
   const currentOrder = [[${currentOrder}]];
   console.log(currentOrder);
@@ -94,21 +95,24 @@
   currentOrder.orders.forEach(order => {
 
     console.log(order.id);
+
     order.orderItems.forEach(item => {
-    console.log(item.orderItemId);
+
       // 각 orderItem을 orderSummary에 추가
       if (!orderSummary[item.itemId]) {
         orderSummary[item.itemId] = {
-          orderId: item.orderId,
           orderItemId: item.orderItemId,
           name: item.name,
           quantity: item.count,
-          price: item.price
+          price: item.price,
+          orderId: order.id
         };
       } else {
         // 기존 품목이 있으면 수량을 증가시킴
         orderSummary[item.itemId].quantity += item.count;
       }
+
+
 
       // 총 수량 및 가격 계산
       totalQuantity += item.count;
@@ -195,10 +199,21 @@
         totalQuantity -= itemQuantity;
         totalPrice -= itemPrice * itemQuantity;
 
-        // 주문 취소 Id
+       // 주문 취소 Id
         const orderItemId = orderSummary[itemId].orderItemId;
+
+        // 취소할 항목을 cancelOrderItemId에 추가
         cancelOrderItemId.push(orderItemId);
         console.log(cancelOrderItemId);
+
+        // 해당 주문ID에 대한 cancelOrderItemId 배열이 없다면 새로 만들고,
+        // 이미 있으면 기존 배열에 항목을 추가
+        const orderId = orderSummary[itemId].orderId; // orderId를 가져오기
+        if (!cancelOrderId[orderId]) {
+          cancelOrderId[orderId] = [];
+        }
+        cancelOrderId[orderId].push(orderItemId);
+        console.log(cancelOrderId);
 
         delete orderSummary[itemId];
 
@@ -262,7 +277,6 @@
       diningName: tableName,
       orderItems: Object.keys(orderSummary).map(itemId => {
         const item = orderSummary[itemId];
-        console.log(currentOrder.orders.id);
         console.log("orderSummary itemId:", item.orderId);  // 여기서 order.id 확인
         return {
            orderId: item.orderId,
@@ -270,10 +284,12 @@
           itemId: itemId,
           count: item.quantity,
           totalPrice: item.price
+
         };
       }),
-      cancelOrderItemId: cancelOrderItemId
+       cancelOrderId: cancelOrderId
     };
+
 
     // 주문 정보를 서버에 전송
     fetch("/order/add", {
@@ -295,7 +311,7 @@
         }
         totalQuantity = 0;
         totalPrice = 0;
-        cancelOrderItemId.length = 0;
+        cancelOrderId.length = 0;
         updateOrderSummary();
       });
   });

@@ -436,3 +436,71 @@ public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderD
 - orderItem이 아주 잘 삭제되었다.
 ### 오류 발생
 - orderItem을 다 취소한 경우 orderItem은 다 삭제되지만 연관 관계로 연결되어있는 order가 삭제되지 않는 오류가 발생하였다.
+
+### 해결
+```
+orderId=[orderItemId,orderItemId]
+```
+- 이런식으로 Map<Long, List<Long>>형식으로 데이터를 받아와
+```java
+public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderDto) {
+    // 주문 삭제
+    if (orderDto.getCancelOrderId() != null) {
+        System.out.println("########### 오더 컨트롤러 delete #############");
+        System.out.println("orderDto.getCancelOrderItemId() = " + orderDto.getCancelOrderId());
+        System.out.println("########### 오더 컨트롤러 delete#############");
+        System.out.println("===============================================");
+        orderService.orderItemDelete(orderDto);
+    }
+}
+```
+- 유효성 검사를 거친 뒤
+```java
+
+    @Transactional
+    public void orderItemDelete(OrderDto orderDto){
+        orderDto.getCancelOrderId().forEach((orderId, orderItemIds) -> {
+            orderItemIds.forEach(orderItemId -> {
+
+                orderItemRepository.deleteById(orderItemId);
+
+                System.out.println("######## orderItemId ###########");
+                System.out.println("orderItemId = " + orderItemId + "삭제");
+                System.out.println("######## orderItemId ###########");
+                System.out.println("======================================");
+            });
+
+            // 영속성 컨텍스트를 DB에 반영
+            orderItemRepository.flush();
+
+            //order를 조회
+            Optional<Order> optionalOrder = orderRepository.findById(orderId);
+            if (optionalOrder.isPresent()) {
+                Order order = optionalOrder.get();
+
+                System.out.println("######## OrderDelete ###########");
+                System.out.println("order = " + order);
+                System.out.println("######## OrderDelete ###########");
+                System.out.println("======================================");
+
+                if (order.getOrderItems().isEmpty()) {
+                    orderRepository.deleteById(orderId);
+                    System.out.println("######## OrderDelete ###########");
+                    System.out.println("orderId = " + orderId + "삭제");
+                    System.out.println("######## OrderDelete ###########");
+                    System.out.println("======================================");
+                }
+            }
+        });
+
+    }
+```
+## 중요!!!! 
+- 먼저 orderItem을 지워주고 flush로 db에 바로 반영해 준다.
+- 이유는 만약 orderItem을 모두 지우는 상황이 오면 연관관계인 order도 지워야 하기 때문이다.
+- 하지만 모든 작업이 끝나기 전에는 영속성 컨텍스트로 남아있기 때문에 DB에 반영이 안 될 수도 있기 때문에 flush()를 사용하는 것이다.
+
+## 오류 발생
+- 신규 주문, 기존 주문 업데이트, 주문 삭제를 동시에 진행하면 기능이 동작은 하지만 변경되지 않는다.
+- 이유는 아마 동시성의 문제인 거 같다.
+- 3가지 부분의 유효성 검사를 다시 손봐야 할 거 같다.

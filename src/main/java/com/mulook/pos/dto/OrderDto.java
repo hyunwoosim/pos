@@ -3,6 +3,7 @@ package com.mulook.pos.dto;
 import com.mulook.pos.entity.Order;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,7 @@ public class OrderDto {
     private List<OrderItemDto> orderItems;
     private int totalOrderPrice;
 
-    private List<Long> cancelOrderItemId;
+    private Map<Long, List<Long>> cancelOrderId;
 
     public OrderDto() {
     }
@@ -65,7 +66,7 @@ public class OrderDto {
             ", created=" + created +
             ", orderItems=" + orderItems +
             ", totalOrderPrice=" + totalOrderPrice +
-            ", cancelOrderItemId=" + cancelOrderItemId +
+            ", cancelOrderId=" + cancelOrderId +
             '}';
     }
 }

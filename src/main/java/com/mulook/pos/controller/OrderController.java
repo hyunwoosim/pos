@@ -27,11 +27,7 @@ public class OrderController {
         List<OrderItemDto> addItems = new ArrayList<>();
         List<OrderItemDto> updateItems = new ArrayList<>();
 
-        System.out.println("######## Order ADD ###########");
-        System.out.println("orderDto = " + orderDto);
-        System.out.println("orderDto. = " + orderDto.getCancelOrderItemId());
-        System.out.println("######## Order ADD ###########");
-        System.out.println("================================");
+
 
         // orderDto의 orderItems를 순회하여 분리
         for (OrderItemDto orderItem : orderDto.getOrderItems()) {
@@ -41,6 +37,13 @@ public class OrderController {
                 updateItems.add(orderItem);  // orderId가 null이 아닌 항목은 업데이트
             }
         }
+
+        System.out.println("######## Order ADD ###########");
+        System.out.println("addItems = " + addItems.isEmpty());
+        System.out.println("================================");
+        System.out.println("updateItems.isEmpty() = " + updateItems.isEmpty());
+        System.out.println("######## Order ADD ###########");
+        System.out.println("================================");
 
         // 새로운 주문 처리
         if (!addItems.isEmpty()) {
@@ -72,9 +75,9 @@ public class OrderController {
         }
 
         // 주문 삭제
-        if(orderDto.getCancelOrderItemId() != null){
+        if(orderDto.getCancelOrderId() != null){
             System.out.println("########### 오더 컨트롤러 delete #############");
-            System.out.println("orderDto.getCancelOrderItemId() = " + orderDto.getCancelOrderItemId());
+            System.out.println("orderDto.getCancelOrderItemId() = " + orderDto.getCancelOrderId());
             System.out.println("########### 오더 컨트롤러 delete#############");
             System.out.println("===============================================");
             orderService.orderItemDelete(orderDto);

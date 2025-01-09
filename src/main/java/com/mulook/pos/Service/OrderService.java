@@ -13,6 +13,7 @@ import com.mulook.pos.repository.OrderRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -79,12 +80,38 @@ public class OrderService {
 
     @Transactional
     public void orderItemDelete(OrderDto orderDto){
-        orderDto.getCancelOrderItemId().forEach(orderItemId ->{
-            orderItemRepository.deleteById(orderItemId);
-            System.out.println("######## OrderDelete ###########");
-            System.out.println("orderItemId = " + orderItemId + "삭제");
-            System.out.println("######## OrderDelete ###########");
-            System.out.println("======================================");
+        orderDto.getCancelOrderId().forEach((orderId, orderItemIds) -> {
+            orderItemIds.forEach(orderItemId -> {
+
+                orderItemRepository.deleteById(orderItemId);
+
+                System.out.println("######## orderItemId ###########");
+                System.out.println("orderItemId = " + orderItemId + "삭제");
+                System.out.println("######## orderItemId ###########");
+                System.out.println("======================================");
+            });
+
+            // 영속성 컨텍스트를 DB에 반영
+            orderItemRepository.flush();
+
+            //order를 조회
+            Optional<Order> optionalOrder = orderRepository.findById(orderId);
+            if (optionalOrder.isPresent()) {
+                Order order = optionalOrder.get();
+
+                System.out.println("######## OrderDelete ###########");
+                System.out.println("order = " + order);
+                System.out.println("######## OrderDelete ###########");
+                System.out.println("======================================");
+
+                if (order.getOrderItems().isEmpty()) {
+                    orderRepository.deleteById(orderId);
+                    System.out.println("######## OrderDelete ###########");
+                    System.out.println("orderId = " + orderId + "삭제");
+                    System.out.println("######## OrderDelete ###########");
+                    System.out.println("======================================");
+                }
+            }
         });
 
     }
