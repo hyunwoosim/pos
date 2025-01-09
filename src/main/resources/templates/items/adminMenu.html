@@ -83,9 +83,11 @@
   const orderSummary = {};
   let totalQuantity = 0;
   let totalPrice = 0;
+  const cancelOrderItemId = [];
 
   const currentOrder = [[${currentOrder}]];
   console.log(currentOrder);
+
 
 
   // currentOrder의 주문 항목(orderItems)을 orderSummary에 추가
@@ -193,7 +195,13 @@
         totalQuantity -= itemQuantity;
         totalPrice -= itemPrice * itemQuantity;
 
+        // 주문 취소 Id
+        const orderItemId = orderSummary[itemId].orderItemId;
+        cancelOrderItemId.push(orderItemId);
+        console.log(cancelOrderItemId);
+
         delete orderSummary[itemId];
+
 
         // 주문 요약 업데이트
         updateOrderSummary();
@@ -263,7 +271,8 @@
           count: item.quantity,
           totalPrice: item.price
         };
-      })
+      }),
+      cancelOrderItemId: cancelOrderItemId
     };
 
     // 주문 정보를 서버에 전송
@@ -286,6 +295,7 @@
         }
         totalQuantity = 0;
         totalPrice = 0;
+        cancelOrderItemId.length = 0;
         updateOrderSummary();
       });
   });

@@ -212,40 +212,39 @@
 ```java
 public DiningTableDto findTableOrder(int name) {
 
-        DiningTable byName = diningTableRepository.findByName(name);
+    DiningTable byName = diningTableRepository.findByName(name);
 
-        DiningTableDto diningTableDto = new DiningTableDto();
-        diningTableDto.setId(byName.getId());
-        diningTableDto.setName(byName.getName());
+    DiningTableDto diningTableDto = new DiningTableDto();
+    diningTableDto.setId(byName.getId());
+    diningTableDto.setName(byName.getName());
 
-        List<OrderDto> orders = byName.getOrders().stream()
-                .map(order ->{
-                    OrderDto orderDtos = new OrderDto();
-                    orderDtos.setId(order.getId());
-                    System.out.println("###############DiningTableService################");
-                    System.out.println("orderDtos.getId() = " + orderDtos.getId());
-                    System.out.println("###############DiningTableService################");
+    List<OrderDto> orders = byName.getOrders().stream()
+        .map(order -> {
+            OrderDto orderDtos = new OrderDto();
+            orderDtos.setId(order.getId());
+            System.out.println("###############DiningTableService################");
+            System.out.println("orderDtos.getId() = " + orderDtos.getId());
+            System.out.println("###############DiningTableService################");
 
-                List<OrderItemDto> items = order.getOrderItems().stream()
-                    .map(item -> new OrderItemDto(
-                        item.getId(),
-                        item.getItem().getId(),
-                        item.getOrder().getId(),
-                        item.getItem().getName(),
-                        item.getItem().getPrice(),
-                        item.getCount()
-                    ))
-                    .collect(Collectors.toList());
-                    orderDtos.setOrderItems(items);
+            List<OrderItemDto> items = order.getOrderItems().stream()
+                .map(item -> new OrderItemDto(
+                    item.getId(),
+                    item.getItem().getId(),
+                    item.getOrder().getId(),
+                    item.getItem().getName(),
+                    item.getItem().getPrice(),
+                    item.getCount()
+                ))
+                .collect(Collectors.toList());
+            orderDtos.setOrderItems(items);
 
+            return orderDtos;
 
-
-                    return orderDtos;
-
-                })
-            .collect(Collectors.toList());
-        diningTableDto.setOrders(orders);
-        return diningTableDto;
+        })
+        .collect(Collectors.toList());
+    diningTableDto.setOrders(orders);
+    return diningTableDto;
+}
 ```
 - 스트림을 사용하여 필요한 데이터들을 넣어서 model에 담아서 전달하였다.
 - 그렇게 하여 주문서에 한 번에 뜨게 만들었다
@@ -383,3 +382,57 @@ public DiningTableDto findTableOrder(int name) {
     
         }
     ```
+
+## 1.10
+### 기능 추가
+- orderItem을 삭제하는 기능을 추가하였다.
+- 엔티티 설계를 잘못한 느낌이 크게 든다.
+- 일단 지금은 ajax로 json으로 받아올때 cancelOrderItemId를 같이 받아오기로 하여 삭제 기능을 처리하였다.
+```
+ const orderDto = {
+      diningName: tableName,
+      orderItems: Object.keys(orderSummary).map(itemId => {
+        const item = orderSummary[itemId];
+        console.log(currentOrder.orders.id);
+        console.log("orderSummary itemId:", item.orderId);  // 여기서 order.id 확인
+        return {
+           orderId: item.orderId,
+          orderItemId: item.orderItemId,
+          itemId: itemId,
+          count: item.quantity,
+          totalPrice: item.price
+        };
+      }),
+      cancelOrderItemId: cancelOrderItemId
+    };
+```
+### Controller
+```java
+@PostMapping("/order/add")
+public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderDto) {
+// 주문 삭제
+    if (orderDto.getCancelOrderItemId() != null) {
+        System.out.println("########### 오더 컨트롤러 delete #############");
+        System.out.println("orderDto.getCancelOrderItemId() = " + orderDto.getCancelOrderItemId());
+        System.out.println("########### 오더 컨트롤러 delete#############");
+        System.out.println("===============================================");
+        orderService.orderItemDelete(orderDto);
+    }
+}
+```
+### Service
+```java
+ @Transactional
+    public void orderItemDelete(OrderDto orderDto){
+        orderDto.getCancelOrderItemId().forEach(orderItemId ->{
+            orderItemRepository.deleteById(orderItemId);
+            System.out.println("######## OrderDelete ###########");
+            System.out.println("orderItemId = " + orderItemId + "삭제");
+            System.out.println("######## OrderDelete ###########");
+            System.out.println("======================================");
+        });
+    }
+```
+- orderItem이 아주 잘 삭제되었다.
+### 오류 발생
+- orderItem을 다 취소한 경우 orderItem은 다 삭제되지만 연관 관계로 연결되어있는 order가 삭제되지 않는 오류가 발생하였다.

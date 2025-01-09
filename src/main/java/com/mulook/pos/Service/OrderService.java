@@ -56,10 +56,6 @@ public class OrderService {
     public void orderUpdate(OrderDto orderDto, List<OrderItemDto> updateItems) {
 
 
-        System.out.println("####### orderUpdate #######");
-        System.out.println("orderDto = " + orderDto.getId());
-        System.out.println("####### orderUpdate #######");
-
         // 1. 업데이트 항목에 해당하는 orderItemId들을 기준으로 각 항목을 업데이트
         updateItems.forEach(orderItemDto -> {
             // updateItems에서 각 항목을 순차적으로 처리
@@ -80,5 +76,18 @@ public class OrderService {
         });
 
     }
+
+    @Transactional
+    public void orderItemDelete(OrderDto orderDto){
+        orderDto.getCancelOrderItemId().forEach(orderItemId ->{
+            orderItemRepository.deleteById(orderItemId);
+            System.out.println("######## OrderDelete ###########");
+            System.out.println("orderItemId = " + orderItemId + "삭제");
+            System.out.println("######## OrderDelete ###########");
+            System.out.println("======================================");
+        });
+
+    }
+
 
 }

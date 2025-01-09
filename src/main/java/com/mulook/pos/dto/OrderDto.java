@@ -19,6 +19,8 @@ public class OrderDto {
     private List<OrderItemDto> orderItems;
     private int totalOrderPrice;
 
+    private List<Long> cancelOrderItemId;
+
     public OrderDto() {
     }
 
@@ -62,27 +64,8 @@ public class OrderDto {
             ", diningName=" + diningName +
             ", created=" + created +
             ", orderItems=" + orderItems +
+            ", totalOrderPrice=" + totalOrderPrice +
+            ", cancelOrderItemId=" + cancelOrderItemId +
             '}';
     }
-//
-//
-//    public static OrderDto from(Order order) {
-//        // Order에서 OrderItemDto 리스트를 생성
-//        List<OrderItemDto> orderItemDtos = OrderItemDto.fromList(order.getOrderItems());
-//
-//
-//
-//            // OrderItem의 총 가격 합산
-//            int totalOrderPrice = orderItemDtos.stream()
-//                .mapToInt(orderItemDto -> orderItemDto.getTotalPrice())
-//                .sum();
-//
-//        System.out.println("########## OrderDTO ###############");
-//        System.out.println("totalOrderPrice = " + totalOrderPrice);
-//        System.out.println("########## OrderDTO ###############");
-//
-//
-//        // 변환된 데이터를 사용하여 OrderDto 객체를 생성하고 반환
-//        return new OrderDto(order.getId(), order.getCreated(), orderItemDtos, totalOrderPrice);
-//    }
 }

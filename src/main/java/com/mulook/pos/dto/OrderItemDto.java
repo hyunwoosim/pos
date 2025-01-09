@@ -44,37 +44,7 @@ public class OrderItemDto {
         this.price = price;
         this.count = count;
     }
-//    public static OrderItemDto from(OrderItem orderItem) {
-//
-//        System.out.println("########## OrderItemDto from #########");
-//        System.out.println("orderItem.getItem().toString() = " + orderItem.getItem().toString());
-//        System.out.println("########## OrderItemDto from #########");
-//        // 단일 OrderItem을 변환
-//        ItemDto itemDto = ItemDto.from(orderItem.getItem());
-//
-//       int totalPrice = orderItem.getCount() * itemDto.getPrice();
-//
-//        return new OrderItemDto(orderItem.getId(), totalPrice, orderItem.getCount(), itemDto);
-//    }
-//
-//    public static List<OrderItemDto> fromList(List<OrderItem> orderItems) {
-//        // OrderItem 리스트를 변환
-//
-//        System.out.println("########## OrderItemDto List #########");
-//        System.out.println(orderItems.stream()
-//                               .map(OrderItemDto::from)
-//                               .collect(Collectors.toList()));
-//        System.out.println("########## OrderItemDto List #########");
-//        return orderItems.stream()
-//            .map(OrderItemDto::from)
-//            .collect(Collectors.toList());
-//    }
-//    // ==  테스트 코드를 위해 생성//
-//    public OrderItemDto(Long itemId, int totalPrice, int count) {
-//        this.itemId = itemId;
-//        this.totalPrice = totalPrice;
-//        this.count = count;
-//    }
+
 
 
     @Override
