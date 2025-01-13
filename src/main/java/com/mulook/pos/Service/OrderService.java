@@ -74,8 +74,9 @@ public class OrderService {
             System.out.println("####### orderUpdate 22#######");
 
             orderRepository.save(order);  // 변경된 주문을 저장 (변경 감지)
-        });
 
+        });
+        orderRepository.flush();
     }
 
     @Transactional
@@ -99,19 +100,20 @@ public class OrderService {
             if (optionalOrder.isPresent()) {
                 Order order = optionalOrder.get();
 
-                System.out.println("######## OrderDelete ###########");
+                System.out.println("######## OrderDelete1111 ###########");
                 System.out.println("order = " + order);
-                System.out.println("######## OrderDelete ###########");
+                System.out.println("######## OrderDelete1111 ###########");
                 System.out.println("======================================");
 
                 if (order.getOrderItems().isEmpty()) {
                     orderRepository.deleteById(orderId);
-                    System.out.println("######## OrderDelete ###########");
+                    System.out.println("######## OrderDelete2222 ###########");
                     System.out.println("orderId = " + orderId + "삭제");
-                    System.out.println("######## OrderDelete ###########");
+                    System.out.println("######## OrderDelete2222 ###########");
                     System.out.println("======================================");
                 }
             }
+            orderRepository.flush();
         });
 
     }

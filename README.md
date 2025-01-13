@@ -495,7 +495,7 @@ public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderD
 
     }
 ```
-## 중요!!!! 
+# 중요!!!! 
 - 먼저 orderItem을 지워주고 flush로 db에 바로 반영해 준다.
 - 이유는 만약 orderItem을 모두 지우는 상황이 오면 연관관계인 order도 지워야 하기 때문이다.
 - 하지만 모든 작업이 끝나기 전에는 영속성 컨텍스트로 남아있기 때문에 DB에 반영이 안 될 수도 있기 때문에 flush()를 사용하는 것이다.
@@ -504,3 +504,52 @@ public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderD
 - 신규 주문, 기존 주문 업데이트, 주문 삭제를 동시에 진행하면 기능이 동작은 하지만 변경되지 않는다.
 - 이유는 아마 동시성의 문제인 거 같다.
 - 3가지 부분의 유효성 검사를 다시 손봐야 할 거 같다.
+
+## 1.13
+- 신규 주문, 기존 항목 업데이트, 삭제 따로따로 기능은 잘 실행되었지만
+- 동시에 기능을 실행하면 삭제가 안 되는 오류가 발생하였다.
+- 동시성의 문제였다.
+### 해결
+```java
+ @PostMapping("/order/add")
+    public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderDto) {
+
+
+        if (orderDto.getCancelOrderId() != null) {
+            orderService.orderItemDelete(orderDto);
+        }
+
+        if (!orderDto.getOrderItems().isEmpty()) {
+            List<OrderItemDto> addItems = new ArrayList<>();
+            List<OrderItemDto> updateItems = new ArrayList<>();
+            splitOrderItems(orderDto, addItems, updateItems);
+
+            if (!addItems.isEmpty()) {
+                orderService.orderAdd(orderDto, addItems);
+            }
+            if (!updateItems.isEmpty()) {
+                orderService.orderUpdate(orderDto, updateItems);
+            }
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("redirectUrl", "/orderTable");
+        return ResponseEntity.ok(response);
+    }
+```
+- 삭제 기능부터 유효성 검사를 시작하였다.
+- 삭제할 게 있으면 삭제한 후 flush로 영속성컨텍스에 있는 삭제 항목을 먼저 처리한다.
+- 그 후 신규 주문과 업데이트의 분리 작업을 시작한다.
+```java
+// 유효성 검사를 통해 addItems,updateItems에 뎉이터를 넣고 있다.
+    private void splitOrderItems(OrderDto orderDto, List<OrderItemDto> addItems, List<OrderItemDto> updateItems) {
+        for (OrderItemDto orderItem : orderDto.getOrderItems()) {
+            if (orderItem.getOrderId() == null) {
+                addItems.add(orderItem);
+            } else {
+                updateItems.add(orderItem);
+            }
+        }
+    }
+```
+- 유효성 검사를 통해 신규 주문 리스트와, 업데이트 리스트를 분리 후 각각의 서비스를 호출한다.

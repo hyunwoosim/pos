@@ -24,65 +24,23 @@ public class OrderController {
     @PostMapping("/order/add")
     public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderDto) {
 
-        List<OrderItemDto> addItems = new ArrayList<>();
-        List<OrderItemDto> updateItems = new ArrayList<>();
 
-
-
-        // orderDto의 orderItems를 순회하여 분리
-        for (OrderItemDto orderItem : orderDto.getOrderItems()) {
-            if (orderItem.getOrderId() == null) {
-                addItems.add(orderItem);  // orderId가 null인 항목은 추가
-            } else {
-                updateItems.add(orderItem);  // orderId가 null이 아닌 항목은 업데이트
-            }
-        }
-
-        System.out.println("######## Order ADD ###########");
-        System.out.println("addItems = " + addItems.isEmpty());
-        System.out.println("================================");
-        System.out.println("updateItems.isEmpty() = " + updateItems.isEmpty());
-        System.out.println("######## Order ADD ###########");
-        System.out.println("================================");
-
-        // 새로운 주문 처리
-        if (!addItems.isEmpty()) {
-            System.out.println("########### 오더 컨틀롤러addItems#############");
-            System.out.println("addItems = " + addItems);
-            System.out.println("########### 오더 컨틀롤러addItems#############");
-            System.out.println("===============================================");
-            System.out.println("########### 오더 컨트롤러 orderDto#############");
-            System.out.println("orderDto = " + orderDto);
-            System.out.println("########### 오더 컨트롤러 orderDto#############");
-
-            // 새로운 주문 항목을 추가하는 서비스 호출
-            orderService.orderAdd(orderDto, addItems);
-        }
-
-        // 기존 주문 업데이트
-        if (!updateItems.isEmpty()) {
-
-            System.out.println("########### 오더 컨트롤러 updateItems#############");
-            System.out.println("updateItems = " + updateItems);
-            System.out.println("########### 오더 컨트롤러 updateItems#############");
-            System.out.println("===============================================");
-            System.out.println("########### 오더 컨트롤러 orderDto#############");
-            System.out.println("orderDto = " + orderDto);
-            System.out.println("########### 오더 컨트롤러 orderDto#############");
-
-            // 기존 주문 항목을 업데이트하는 서비스 호출
-            orderService.orderUpdate(orderDto, updateItems);
-        }
-
-        // 주문 삭제
-        if(orderDto.getCancelOrderId() != null){
-            System.out.println("########### 오더 컨트롤러 delete #############");
-            System.out.println("orderDto.getCancelOrderItemId() = " + orderDto.getCancelOrderId());
-            System.out.println("########### 오더 컨트롤러 delete#############");
-            System.out.println("===============================================");
+        if (orderDto.getCancelOrderId() != null) {
             orderService.orderItemDelete(orderDto);
         }
 
+        if (!orderDto.getOrderItems().isEmpty()) {
+            List<OrderItemDto> addItems = new ArrayList<>();
+            List<OrderItemDto> updateItems = new ArrayList<>();
+            splitOrderItems(orderDto, addItems, updateItems);
+
+            if (!addItems.isEmpty()) {
+                orderService.orderAdd(orderDto, addItems);
+            }
+            if (!updateItems.isEmpty()) {
+                orderService.orderUpdate(orderDto, updateItems);
+            }
+        }
 
         Map<String, String> response = new HashMap<>();
         response.put("redirectUrl", "/orderTable");
@@ -90,4 +48,14 @@ public class OrderController {
     }
 
 
+    // 유효성 검사를 통해 addItems,updateItems에 뎉이터를 넣고 있다.
+    private void splitOrderItems(OrderDto orderDto, List<OrderItemDto> addItems, List<OrderItemDto> updateItems) {
+        for (OrderItemDto orderItem : orderDto.getOrderItems()) {
+            if (orderItem.getOrderId() == null) {
+                addItems.add(orderItem);
+            } else {
+                updateItems.add(orderItem);
+            }
+        }
+    }
 }
