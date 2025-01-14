@@ -553,3 +553,11 @@ public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderD
     }
 ```
 - 유효성 검사를 통해 신규 주문 리스트와, 업데이트 리스트를 분리 후 각각의 서비스를 호출한다.
+
+## 1.14
+### 결제 시스템 구현중
+- 토스 poss를 벤치 마킹하였기 때문에 결제 시스템도 toss Pay를 사용하기로 하였다.
+- toss Pay의 결제 기능은 구현은 개발 문서에 아주 자세하게 설명되어 있고 샌드박스를 사용할 수 있어서 보다 편하게 구현이 가능하다.
+- 출처 : https://docs.tosspayments.com/guides/v2/payment-widget/integration?backend=java
+<img src="READMEImages/tosspay구현중.png">
+- 이제 데이터를 잘 가공하여서 다듬으면 된다.

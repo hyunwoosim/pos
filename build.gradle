@@ -48,6 +48,10 @@ dependencies {
 	// AWS 연동
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
 
+	// tossPay결제시스템을 위한 Json-simple 추가
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+
 
 }
 

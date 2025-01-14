@@ -36,27 +36,6 @@ public class DiningTableDto {
         this.orders = orders;
     }
 
-
-//
-//    public static DiningTableDto from(DiningTable diningTable) {
-//        List<OrderDto> orderDtos = diningTable.getOrders().stream()
-//            .map(OrderDto::from)
-//            .collect(Collectors.toList());
-//
-//        // 모든 Order의 총 금액 합산
-//        int totalDiningTablePrice = orderDtos.stream()
-//            .mapToInt(OrderDto::getTotalOrderPrice)
-//            .sum();
-//
-//        System.out.println("########## DiningTableDto ###############");
-//        System.out.println("totalDiningTablePrice = " + totalDiningTablePrice);
-//        System.out.println("########## DiningTableDto ###############");
-//
-//
-//        return new DiningTableDto(diningTable.getId(), diningTable.getName(), orderDtos, totalDiningTablePrice);
-//    }
-
-
     @Override
     public String toString() {
         return "DiningTableDto{" +
