@@ -51,13 +51,21 @@ public class DiningTableService {
                     .collect(Collectors.toList());
                     orderDtos.setOrderItems(items);
 
+                    int totalOrderPrice = items.stream()
+                        .mapToInt(item -> item.getPrice() * item.getCount())
+                        .sum();
+                    orderDtos.setTotalOrderPrice(totalOrderPrice);
 
 
                     return orderDtos;
 
                 })
             .collect(Collectors.toList());
+        int totalDiningTablePrice = orders.stream()
+            .mapToInt(OrderDto::getTotalOrderPrice) // 각 OrderDto의 총 가격을 합산
+            .sum();
         diningTableDto.setOrders(orders);
+        diningTableDto.setTotalDiningTablePrice(totalDiningTablePrice);
 
 
         System.out.println("###############DiningTableService################");

@@ -35,15 +35,7 @@ public class ItemDto {
         this.itemType = itemType;
     }
 
-//    public ItemDto(Long id, String name, int price) {
-//        this.id = id;
-//        this.name = name;
-//        this.price = price;
-//    }
-//
-//    public static ItemDto from(Item item) {
-//        return new ItemDto(item.getId(), item.getName(), item.getPrice());
-//    }
+
 
     @Override
     public String toString() {

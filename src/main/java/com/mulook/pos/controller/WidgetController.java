@@ -1,6 +1,9 @@
 package com.mulook.pos.controller;
 
+import com.mulook.pos.Service.DiningTableService;
+import com.mulook.pos.dto.DiningTableDto;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -9,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,19 +25,34 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Controller
+@RequiredArgsConstructor
 public class WidgetController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final DiningTableService diningTableService;
 
 
-    @GetMapping("/tossPay/checkout")
-    public String GetTossPay() {
+    @GetMapping("/tossPay/checkout/{currentName}")
+    public String GetTossPay(Model model, @PathVariable int currentName) {
+
+        DiningTableDto currentOrder = diningTableService.findTableOrder(currentName);
+
+        System.out.println("########WidgetController-currentOrder########");
+        System.out.println("currentOrder = " + currentOrder);
+        System.out.println("########WidgetController-currentOrder########");
+
+        model.addAttribute("currentOrder", currentOrder);
+        model.addAttribute("getTotalDiningTablePrice", currentOrder.getTotalDiningTablePrice());
+
         return "/tossPay/checkout.html";
     }
 
     @RequestMapping(value = "/confirm")
     public ResponseEntity<JSONObject> confirmPayment(@RequestBody String jsonBody)
         throws Exception {
+
+        System.out.println("############WidgetController-confirmPayment##########");
+        System.out.println("############WidgetController-confirmPayment##########");
 
         JSONParser parser = new JSONParser();
         String orderId;

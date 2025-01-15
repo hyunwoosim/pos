@@ -18,10 +18,48 @@
 
 <!--결제 내역 표시 예정-->
 <div>결제 내역 표시 예정</div>
+<div th:each="current : ${currentOrder}">
+  <h2>주문테이블 아이디 : <span th:text="${current.id}"></span></h2>
+  <h2>주문테이블 번호 : <span th:text="${current.name}"></span></h2>
+
+  <!-- 각 Order 출력 -->
+  <div th:each="order : ${current.orders}">
+    <h4>OrderId: <span th:text="${order.id}"></span></h4>
+
+    <!-- 각 OrderItem 출력 -->
+    <table>
+      <thead>
+      <tr>
+        <th>orderItemId ||</th>
+        <th>Item ID ||</th>
+        <th>Name ||</th>
+        <th>Item Price ||</th>
+        <th>Count ||</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="orderItem : ${order.orderItems}">
+        <td><span th:text="${orderItem.orderItemId}"></span></td>
+        <td><span th:text="${orderItem.itemId}"></span></td> <!-- itemId 출력 -->
+        <td><span th:text="${orderItem.name}"></span></td> <!-- name 출력 -->
+        <td><span th:text="${orderItem.price}"></span></td> <!-- price 출력 -->
+        <td><span th:text="${orderItem.count}"></span></td> <!-- count 출력 -->
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- DiningTable의 총합 금액 -->
+  <h5>총합가격: <span id="total-price" th:text="${current.totalDiningTablePrice}"></span></h5>
+
+</div>
+
 <!-- 결제하기 버튼 -->
 <button class="button" id="payment-button" style="margin-top: 30px">결제하기</button>
 
 <script>
+  const totalPriceElement = document.getElementById("total-price");
+const totalDiningTablePrice = parseInt(totalPriceElement.textContent, 10); // 총합가격 가져오기
+
   main();
 
   async function main() {
@@ -41,7 +79,7 @@
     // ------ 주문의 결제 금액 설정 ------
     await widgets.setAmount({
       currency: "KRW",
-      value: 50000,
+      value: totalDiningTablePrice,
     });
 
     await Promise.all([
@@ -59,7 +97,7 @@
       if (coupon.checked) {
         await widgets.setAmount({
           currency: "KRW",
-          value: 50000 - 5000,
+          value: totalDiningTablePrice,
         });
 
         return;
@@ -67,7 +105,7 @@
 
       await widgets.setAmount({
         currency: "KRW",
-        value: 50000,
+        value: totalDiningTablePrice,
       });
     });
 
@@ -78,8 +116,8 @@
         orderName: "토스 티셔츠 외 2건",
         successUrl: window.location.origin + "/success.html",
         failUrl: window.location.origin + "/fail.html",
-        customerEmail: "customer123@gmail.com",
-        customerName: "김토스",
+        customerEmail: "kshsim98@naver.com",
+        customerName: "MulookPos",
         customerMobilePhone: "01012341234",
       });
     });

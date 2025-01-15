@@ -88,7 +88,10 @@ public class ItemController {
         System.out.println("##############Cotroller###########");
         System.out.println("currentOrder = " + currentOrder.toString());
         System.out.println("##############Cotroller###########");
-
+        System.out.println("===================================");
+        System.out.println("##############Cotroller###########");
+        System.out.println("currentOrder = " + currentOrder.getTotalDiningTablePrice());
+        System.out.println("##############Cotroller###########");
 
 
         model.addAttribute("itemTypeListMap", itemTypeListMap);

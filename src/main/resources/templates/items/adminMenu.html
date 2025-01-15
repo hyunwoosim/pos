@@ -77,8 +77,7 @@
   <button id="submit-order">주문</button>
 </div>
 
-<div>
-  <a href="/tossPay/checkout">
+  <a th:href="@{/tossPay/checkout/{currentName}(currentName=${currentOrder.name})}">
   <button>결제</button>
   </a>
 </div>

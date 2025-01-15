@@ -33,6 +33,8 @@ public class OrderDto {
         this.diningName = diningName;
     }
 
+
+
     public OrderDto(LocalDateTime created, List<OrderItemDto> orderItems) {
         this.created = created;
         this.orderItems = orderItems;
@@ -69,4 +71,6 @@ public class OrderDto {
             ", cancelOrderId=" + cancelOrderId +
             '}';
     }
+
+
 }
