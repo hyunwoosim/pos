@@ -1,3 +1,131 @@
+
+
+
+# TIL (Today I Learned)
+
+
+
+## 📅 날짜: 01-21
+
+---
+
+## 1. 진행 상황 🛠️
+- TossPay API를 사용해서 결제시스템을 구현 중
+  - 결제 요청을 할 때 결제 내역 검증을 위한 orderId,amount,payStatus 등을 저장 구현
+
+- **프로젝트/기능명**: [결제 요청 전 검증을 위한 저장 구현]
+- **진행한 작업**:
+    - [O] 기능 개발:
+1. PayMent Entity, Enum(PayType, PayStatus), PaymentRequestDto, TossWidgetController, TossWidgetService, tossPay템플릿 구현
+2. PaymentRequestDto에서 저장하는 값을 Builder 패턴을 사용하여 amount 값 프론트에서 받아오고 TossPay Document의 규칙을 적용하여 OrderId는 UUID를 적용 시켰다.
+    ```java
+        @Getter
+        @Setter
+        @Builder
+        public class PaymentRequestDto {
+            // 결제 요청을 받을 Dto
+            private PayStatus payStatus;
+            private String tossOrderId;
+            private int amount;
+            private LocalDateTime requestedAt;
+    
+            public Payment toEntity() {
+                return Payment.builder()
+                    .payStatus(PayStatus.READY)
+                    .tossOrderId(UUID.randomUUID().toString())
+                 .totalAmount(amount)
+                 .requestedAt(LocalDateTime.now())
+                 .build();
+            }
+        }
+    ```
+3. POSTMAN에서 ResponseEntity.ok결과값 저장 성공이 잘 넘어 오고 있다.
+<img src="READMEImages/TossPay결제%20검증용%20PostMan.png">
+
+4. DB에도 잘 들어간다.
+<img src="READMEImages/TossPay결제%20검증용%20DB.png">
+---
+
+## 🔗 참고 자료 📚
+1. TossPay Document
+   - [https://docs.tosspayments.com/guides/v2/payment-widget/integration]
+---
+
+
+
+# 📅 날짜: 12.16
+
+---
+
+## 1. 진행 상황 🛠️
+Redis를 사용한 이메일 인증 기능 구현
+
+- **프로젝트/기능명**: [이메일 인증 기능]
+- **진행한 작업**:
+    - [O] 기능 개발: 
+      1. Redis와 SMTP 서버를 사용하여 이메일 인증 기능 구현
+      2. 6자리의 랜덤 숫자 코드를 입력하여 인증
+      3. Ajax를 사용한 비동기 처리
+
+---
+
+## 2. 오류 및 해결 방법 ⚠️
+작업 중에 발생한 오류와 이를 어떻게 해결했는지 기록합니다.
+
+### 🔍 오류 1
+- **오류 내용**: [발생한 오류에 대한 상세 설명]
+- **원인 분석**: [오류가 발생한 이유]
+- **해결 방법**:
+    1. [해결 과정 1]
+    2. [해결 과정 2]
+
+### 🔍 오류 2
+- **오류 내용**: [발생한 오류에 대한 상세 설명]
+- **원인 분석**: [오류가 발생한 이유]
+- **해결 방법**:
+    1. [해결 과정 1]
+    2. [해결 과정 2]
+
+---
+
+## 3. 회고 📝
+오늘 작업에 대한 회고와 느낀 점, 개선할 점 등을 작성합니다.
+
+- **잘한 점**:
+    - [어떤 점에서 효율적이었는지, 만족스러웠는지 기록]
+- **아쉬운 점**:
+    - [개선해야 할 부분, 다음에 더 잘할 수 있는 부분 기록]
+- **앞으로의 계획**:
+    - [다음 작업에서 적용할 계획 또는 학습할 주제]
+
+---
+
+## 🔗 참고 자료 📚
+작업 중 참고한 자료 또는 링크를 정리합니다.
+
+- [문서 링크나 블로그 포스트]
+- [레퍼런스 코드나 관련 강의]
+
+---
+
+# 📅 날짜: 12-13
+
+---
+
+## 1. 진행 상황 🛠️
+회원 가입 기능 완성
+
+- **프로젝트/기능명**: [회원 가입 기능]
+- **진행한 작업**:
+    - [O] 기능 개발:
+      1. @Valid를 사용하여 회원가입시 중복검사 기능을 구현 Id값으로 중복검사를 실행한다.
+      2. BCryptPasswordEncoder를 사용하여 비밀번호를 암호화
+
+
+---
+
+
+=============================================================================
 # 포스 단말기 구현
 
 ## 개요
@@ -561,3 +689,65 @@ public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderD
 - 출처 : https://docs.tosspayments.com/guides/v2/payment-widget/integration?backend=java
 <img src="READMEImages/tosspay구현중.png">
 - 이제 데이터를 잘 가공하여서 다듬으면 된다.
+
+
+
+TIL 양식
+```
+# TIL (Today I Learned)
+
+## 📅 날짜: YYYY-MM-DD
+
+---
+
+## 1. 진행 상황 🛠️
+오늘 어떤 작업을 진행했는지 정리합니다.
+
+- **프로젝트/기능명**: [여기에 작업한 프로젝트나 기능 이름을 작성]
+- **진행한 작업**:
+    - [ ] 기능 개발: [구현한 기능 설명]
+    - [ ] 테스트 코드 작성: [테스트한 내용]
+    - [ ] 리팩토링: [리팩토링한 부분과 이유]
+    - [ ] 문서 작성: [작성한 문서 또는 기록]
+
+---
+
+## 2. 오류 및 해결 방법 ⚠️
+작업 중에 발생한 오류와 이를 어떻게 해결했는지 기록합니다.
+
+### 🔍 오류 1
+- **오류 내용**: [발생한 오류에 대한 상세 설명]
+- **원인 분석**: [오류가 발생한 이유]
+- **해결 방법**:
+    1. [해결 과정 1]
+    2. [해결 과정 2]
+
+### 🔍 오류 2
+- **오류 내용**: [발생한 오류에 대한 상세 설명]
+- **원인 분석**: [오류가 발생한 이유]
+- **해결 방법**:
+    1. [해결 과정 1]
+    2. [해결 과정 2]
+
+---
+
+## 3. 회고 📝
+오늘 작업에 대한 회고와 느낀 점, 개선할 점 등을 작성합니다.
+
+- **잘한 점**:
+    - [어떤 점에서 효율적이었는지, 만족스러웠는지 기록]
+- **아쉬운 점**:
+    - [개선해야 할 부분, 다음에 더 잘할 수 있는 부분 기록]
+- **앞으로의 계획**:
+    - [다음 작업에서 적용할 계획 또는 학습할 주제]
+
+---
+
+## 🔗 참고 자료 📚
+작업 중 참고한 자료 또는 링크를 정리합니다.
+
+- [문서 링크나 블로그 포스트]
+- [레퍼런스 코드나 관련 강의]
+
+---
+```

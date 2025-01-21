@@ -1,7 +1,6 @@
 package com.mulook.pos.dto;
 
-import com.mulook.pos.entity.Item;
-import com.mulook.pos.entity.ItemType;
+import com.mulook.pos.entity.Enum.ItemType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

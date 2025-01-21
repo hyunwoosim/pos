@@ -58,7 +58,7 @@
 
 <script>
   const totalPriceElement = document.getElementById("total-price");
-const totalDiningTablePrice = parseInt(totalPriceElement.textContent, 10); // 총합가격 가져오기
+  const totalDiningTablePrice = parseInt(totalPriceElement.textContent, 10); // 총합가격 가져오기
 
   main();
 
@@ -109,16 +109,38 @@ const totalDiningTablePrice = parseInt(totalPriceElement.textContent, 10); // �
       });
     });
 
+    async function savePaymentRequest(amount) {
+      const response = await fetch("/saveAmount", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: 10000,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save payment request.");
+      }
+    }
+
+
+
     // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
     button.addEventListener("click", async function () {
+
+      await savePaymentRequest(amount);
+
       await widgets.requestPayment({
-        orderId: "-kzOI0M_1JVGJEY9KeERY",
-        orderName: "토스 티셔츠 외 2건",
-        successUrl: window.location.origin + "/tossPay/success.html",
-        failUrl: window.location.origin + "/fail.html",
-        customerEmail: "kshsim98@naver.com",
-        customerName: "MulookPos",
-        customerMobilePhone: "01012341234",
+        orderId: "kasdfalsf",
+        amount: totalDiningTablePrice
+<!--        orderName: "토스 티셔츠 외 2건",-->
+<!--        successUrl: window.location.origin + "/tossPay/success.html",-->
+<!--        failUrl: window.location.origin + "/fail.html",-->
+<!--        customerEmail: "kshsim98@naver.com",-->
+<!--        customerName: "MulookPos",-->
+<!--        customerMobilePhone: "01012341234",-->
       });
     });
   }

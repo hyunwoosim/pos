@@ -35,15 +35,7 @@ public class MemberService {
     // 중복 있으면 false 반환
     @Transactional
     public boolean validateDuplicateMemberID(String loginId) {
-        System.out.println("###########SERVICE111###########");
-        System.out.println("loginId = " + loginId);
-        System.out.println("###########SERVICE1111###########");
-
         Optional<Member> byLoginId = memberRepository.findByLoginId(loginId);
-
-        System.out.println("###########SERVICE2222##########");
-        System.out.println("byLoginId = " + byLoginId);
-        System.out.println("###########SERVICE2222###########");
 
         return byLoginId.isEmpty(); // 중복된 아이디가 없으면 true 반환
     }
