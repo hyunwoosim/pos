@@ -16,8 +16,13 @@
 - **프로젝트/기능명**: [결제 요청 전 검증을 위한 저장 구현]
 - **진행한 작업**:
     - [O] 기능 개발:
-1. PayMent Entity, Enum(PayType, PayStatus), PaymentRequestDto, TossWidgetController, TossWidgetService, tossPay템플릿 구현
-2. PaymentRequestDto에서 저장하는 값을 Builder 패턴을 사용하여 amount 값 프론트에서 받아오고 TossPay Document의 규칙을 적용하여 OrderId는 UUID를 적용 시켰다.
+
+
+1. TossPay에서 제시해주는 결제 흐름이다. 결제 요청전 결제금액 확인, 취소 등을 확인하기 위해 결제 정보를 저장하라고 제시한다.
+   <img src="/READMEImages/TossPay결제 흐름.png"/>
+
+2. PayMent Entity, Enum(PayType, PayStatus), PaymentRequestDto, TossWidgetController, TossWidgetService, tossPay템플릿 구현
+3. PaymentRequestDto에서 저장하는 값을 Builder 패턴을 사용하여 amount 값 프론트에서 받아오고 TossPay Document의 규칙을 적용하여 OrderId는 UUID를 적용 시켰다.
     ```java
         @Getter
         @Setter
@@ -39,10 +44,10 @@
             }
         }
     ```
-3. POSTMAN에서 ResponseEntity.ok결과값 저장 성공이 잘 넘어 오고 있다.
+4. POSTMAN에서 ResponseEntity.ok결과값 저장 성공이 잘 넘어 오고 있다.
 <img src="READMEImages/TossPay결제%20검증용%20PostMan.png">
 
-4. DB에도 잘 들어간다.
+5. DB에도 잘 들어간다.
 <img src="READMEImages/TossPay결제%20검증용%20DB.png">
 ---
 
