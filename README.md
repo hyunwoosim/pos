@@ -19,7 +19,7 @@
 
 
 1. TossPay에서 제시해주는 결제 흐름이다. 결제 요청전 결제금액 확인, 취소 등을 확인하기 위해 결제 정보를 저장하라고 제시한다.
-   <img src="/READMEImages/TossPay결제 흐름.png"/>
+      <img src="/READMEImages/TossPay결제 흐름.png"/>
 
 2. PayMent Entity, Enum(PayType, PayStatus), PaymentRequestDto, TossWidgetController, TossWidgetService, tossPay템플릿 구현
 3. PaymentRequestDto에서 저장하는 값을 Builder 패턴을 사용하여 amount 값 프론트에서 받아오고 TossPay Document의 규칙을 적용하여 OrderId는 UUID를 적용 시켰다.

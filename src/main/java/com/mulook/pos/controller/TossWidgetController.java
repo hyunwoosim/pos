@@ -4,6 +4,7 @@ import com.mulook.pos.Service.DiningTableService;
 import com.mulook.pos.Service.TossWidgetService;
 import com.mulook.pos.dto.DiningTableDto;
 import com.mulook.pos.dto.PaymentRequestDto;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -24,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,10 +36,28 @@ public class TossWidgetController {
     private final TossWidgetService tossWidgetService;
 
 
+    @GetMapping("/success")
+    public ResponseEntity verify(
+        @RequestParam String paymentsKey,
+        @RequestParam String orderId,
+        @RequestParam int amount){
+
+        System.out.println("########## verify Controller ##########");
+        System.out.println("paymentsKey = " + paymentsKey);
+        System.out.println("orderId = " + orderId);
+        System.out.println("amount = " + amount);
+        System.out.println("########## verify Controller ##########");
+
+        tossWidgetService.verify(paymentsKey, orderId, amount);
+
+        return ResponseEntity.ok("ok");
+    }
+
     @PostMapping("/saveAmount")
     public ResponseEntity<String> savePayment(@RequestBody PaymentRequestDto paymentRequestDto){
         System.out.println("###### SaveAmount Controller########");
         System.out.println("paymentRequestDto = " + paymentRequestDto);
+        System.out.println("paymentRequestDto.getTossOrderId() = " + paymentRequestDto.getOrderId());
         System.out.println("###### SaveAmount Controller########");
         tossWidgetService.savePayment(paymentRequestDto);
         return ResponseEntity.ok("저장 성공");
@@ -47,14 +67,16 @@ public class TossWidgetController {
     public String GetTossPay(Model model, @PathVariable int currentName) {
 
         DiningTableDto currentOrder = diningTableService.findTableOrder(currentName);
+        String tossOrderId = generateUniqueOrderId();
 
         System.out.println("########WidgetController-currentOrder########");
         System.out.println("currentOrder = " + currentOrder);
+        System.out.println("tossOrderId = " + tossOrderId);
         System.out.println("########WidgetController-currentOrder########");
 
         model.addAttribute("currentOrder", currentOrder);
         model.addAttribute("getTotalDiningTablePrice", currentOrder.getTotalDiningTablePrice());
-
+        model.addAttribute("tossOrderId", tossOrderId);
         return "/tossPay/checkout.html";
     }
 
@@ -117,4 +139,10 @@ public class TossWidgetController {
         return ResponseEntity.status(code).body(jsonObject);
     }
 
+    // tossOrderId로 사용할 랜덤 UUID 생성기
+    private String generateUniqueOrderId() {
+        String currentTime = String.valueOf(System.currentTimeMillis()); // 현재 시간을 밀리초로 가져옴
+        String randomString = UUID.randomUUID().toString().substring(0, 6); // 랜덤 문자열 일부만 사용 (예: 앞 6자리)
+        return "ORDER-" + currentTime + "-" + randomString; // "ORDER-<현재시간>-<랜덤문자열>"
+    }
 }

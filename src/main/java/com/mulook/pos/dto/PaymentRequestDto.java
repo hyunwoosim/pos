@@ -15,14 +15,14 @@ import lombok.Setter;
 public class PaymentRequestDto {
     // 결제 요청을 받을 Dto
     private PayStatus payStatus;
-    private String tossOrderId;
+    private String orderId;
     private int amount;
     private LocalDateTime requestedAt;
 
     public Payment toEntity() {
         return Payment.builder()
             .payStatus(PayStatus.READY)
-            .tossOrderId(UUID.randomUUID().toString())
+            .tossOrderId(orderId)
             .totalAmount(amount)
             .requestedAt(LocalDateTime.now())
             .build();

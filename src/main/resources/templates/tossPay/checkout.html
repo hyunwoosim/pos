@@ -24,7 +24,7 @@
 
   <!-- 각 Order 출력 -->
   <div th:each="order : ${current.orders}">
-    <h4>OrderId: <span th:text="${order.id}"></span></h4>
+    <h4>OrderId: <span id="orderId" th:text="${order.id}"></span></h4>
 
     <!-- 각 OrderItem 출력 -->
     <table>
@@ -41,7 +41,7 @@
       <tr th:each="orderItem : ${order.orderItems}">
         <td><span th:text="${orderItem.orderItemId}"></span></td>
         <td><span th:text="${orderItem.itemId}"></span></td> <!-- itemId 출력 -->
-        <td><span th:text="${orderItem.name}"></span></td> <!-- name 출력 -->
+        <td><span id="ItemName" th:text="${orderItem.name}"></span></td> <!-- name 출력 -->
         <td><span th:text="${orderItem.price}"></span></td> <!-- price 출력 -->
         <td><span th:text="${orderItem.count}"></span></td> <!-- count 출력 -->
       </tr>
@@ -51,6 +51,7 @@
   <!-- DiningTable의 총합 금액 -->
   <h5>총합가격: <span id="total-price" th:text="${current.totalDiningTablePrice}"></span></h5>
 
+  <div>주문 ID: <span style="display:none" id="tossOrderId" th:text="${tossOrderId}"></span></div>
 </div>
 
 <!-- 결제하기 버튼 -->
@@ -59,6 +60,15 @@
 <script>
   const totalPriceElement = document.getElementById("total-price");
   const totalDiningTablePrice = parseInt(totalPriceElement.textContent, 10); // 총합가격 가져오기
+
+  const tossOrderId = document.getElementById("tossOrderId");
+  console.log(tossOrderId.textContent);
+
+  const OrderName = Array.from(document.querySelectorAll("#ItemName")).map((el) => el.textContent.trim())
+  .join(", ");
+  console.log(OrderName);
+
+
 
   main();
 
@@ -109,14 +119,15 @@
       });
     });
 
-    async function savePaymentRequest(amount) {
+    async function savePaymentRequest(orderId,amount) {
       const response = await fetch("/saveAmount", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: 10000,
+          orderId: tossOrderId.textContent,
+          amount: totalDiningTablePrice,
         }),
       });
 
@@ -125,22 +136,17 @@
       }
     }
 
-
-
     // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
     button.addEventListener("click", async function () {
 
-      await savePaymentRequest(amount);
+
+      await savePaymentRequest(orderId,totalDiningTablePrice);
 
       await widgets.requestPayment({
-        orderId: "kasdfalsf",
-        amount: totalDiningTablePrice
-<!--        orderName: "토스 티셔츠 외 2건",-->
-<!--        successUrl: window.location.origin + "/tossPay/success.html",-->
-<!--        failUrl: window.location.origin + "/fail.html",-->
-<!--        customerEmail: "kshsim98@naver.com",-->
-<!--        customerName: "MulookPos",-->
-<!--        customerMobilePhone: "01012341234",-->
+        orderId: tossOrderId.textContent,
+        orderName: String(OrderName),
+        successUrl: window.location.origin + "/success",
+        failUrl: window.location.origin + "/fail",
       });
     });
   }
