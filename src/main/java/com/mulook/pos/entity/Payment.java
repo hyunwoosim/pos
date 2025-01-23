@@ -39,16 +39,37 @@ public class Payment {
 
    private String tossOrderName;
 
+   private String method;  // 결제 수단
+
+   private String provider; // 간편 결제: 카카오페이, 토스 등등
+
     @Enumerated(EnumType.STRING)
    private PayStatus payStatus;
 
    private int totalAmount;
 
    // 결제 요청시간
-   private LocalDateTime requestedAt;
+   private String requestedAt;
 
    // 결제 승인 시간
-   private LocalDateTime approvedAt;
+   private String approvedAt;
 
 
+   // 비즈니스 로직
+    public void updatePayStatus(PayStatus newStatus){
+        this.payStatus = newStatus;
+    }
+
+
+
+    public void successPayment(String paymentKey, PayType payType, String tossOrderName, PayStatus payStatus,
+        String method, String provider, String approvedAt) {
+        this.paymentKey = paymentKey;
+        this.payType = payType;
+        this.tossOrderName = tossOrderName;
+        this.payStatus = payStatus;
+        this.method = method;
+        this.provider = provider;
+        this.approvedAt = approvedAt;
+    }
 }

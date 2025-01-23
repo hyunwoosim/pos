@@ -4,10 +4,12 @@
   <meta charset="utf-8" />
 </head>
 <body>
-<h2>결제 성공</h2>
+<h2>결제 요청까지 성공</h2>
 <p id="paymentKey"></p>
 <p id="orderId"></p>
 <p id="amount"></p>
+
+<button onclick="confirm()">결제 완료 하기</button>
 
 <script>
   // 쿼리 파라미터 값이 결제 요청할 때 보낸 데이터와 동일한지 반드시 확인하세요.
@@ -41,9 +43,10 @@
     }
 
     // 결제 성공 비즈니스 로직을 구현하세요.
+    location.href = "http://localhost:8080/orderTable"
     console.log(json);
   }
-  confirm();
+
 
   const paymentKeyElement = document.getElementById("paymentKey");
   const orderIdElement = document.getElementById("orderId");

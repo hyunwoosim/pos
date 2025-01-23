@@ -2,8 +2,10 @@ package com.mulook.pos.controller;
 
 import com.mulook.pos.Service.DiningTableService;
 import com.mulook.pos.Service.TossWidgetService;
+import com.mulook.pos.config.TossPaymentConfig;
 import com.mulook.pos.dto.DiningTableDto;
 import com.mulook.pos.dto.PaymentRequestDto;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
@@ -11,6 +13,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,23 +37,31 @@ public class TossWidgetController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final DiningTableService diningTableService;
     private final TossWidgetService tossWidgetService;
+    private final TossPaymentConfig tossPaymentConfig;
 
 
     @GetMapping("/success")
-    public ResponseEntity verify(
-        @RequestParam String paymentsKey,
+    public String verify(
+        @RequestParam String paymentKey,
         @RequestParam String orderId,
-        @RequestParam int amount){
+        @RequestParam int amount,
+        Model model
+        ){
+
 
         System.out.println("########## verify Controller ##########");
-        System.out.println("paymentsKey = " + paymentsKey);
+        System.out.println("paymentsKey = " + paymentKey);
         System.out.println("orderId = " + orderId);
         System.out.println("amount = " + amount);
         System.out.println("########## verify Controller ##########");
 
-        tossWidgetService.verify(paymentsKey, orderId, amount);
+        tossWidgetService.verify(paymentKey, orderId, amount);
 
-        return ResponseEntity.ok("ok");
+        model.addAttribute("paymentKey", paymentKey);
+        model.addAttribute("orderId", orderId);
+        model.addAttribute("amount", amount);
+
+        return "/tossPay/success.html";
     }
 
     @PostMapping("/saveAmount")
@@ -74,9 +85,15 @@ public class TossWidgetController {
         System.out.println("tossOrderId = " + tossOrderId);
         System.out.println("########WidgetController-currentOrder########");
 
+        String clientApiKey = tossPaymentConfig.getClientApiKey();
+        System.out.println("########WidgetController-currentOrder########");
+        System.out.println("clientApiKey = " + clientApiKey);
+        System.out.println("########WidgetController-currentOrder########");
+
         model.addAttribute("currentOrder", currentOrder);
         model.addAttribute("getTotalDiningTablePrice", currentOrder.getTotalDiningTablePrice());
         model.addAttribute("tossOrderId", tossOrderId);
+        model.addAttribute("clientApiKey", clientApiKey);
         return "/tossPay/checkout.html";
     }
 
@@ -135,6 +152,11 @@ public class TossWidgetController {
         Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
         JSONObject jsonObject = (JSONObject) parser.parse(reader);
         responseStream.close();
+
+        System.out.println("########## tossWidgetController confirm #################");
+        System.out.println("jsonObject = " + jsonObject);
+        System.out.println("########## tossWidgetController confirm #################");
+        tossWidgetService.successPayment(jsonObject);
 
         return ResponseEntity.status(code).body(jsonObject);
     }

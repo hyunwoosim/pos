@@ -4,6 +4,8 @@ import com.mulook.pos.entity.Enum.PayStatus;
 import com.mulook.pos.entity.Enum.PayType;
 import com.mulook.pos.entity.Payment;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,14 +19,19 @@ public class PaymentRequestDto {
     private PayStatus payStatus;
     private String orderId;
     private int amount;
-    private LocalDateTime requestedAt;
+    private String requestedAt;
 
     public Payment toEntity() {
+
+        OffsetDateTime now = OffsetDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+        String formattedNow = now.format(formatter);
+
         return Payment.builder()
             .payStatus(PayStatus.READY)
             .tossOrderId(orderId)
             .totalAmount(amount)
-            .requestedAt(LocalDateTime.now())
+            .requestedAt(formattedNow)
             .build();
     }
 }
