@@ -13,10 +13,166 @@ TossPaymets의 요청을 받고 검증 후 승인까지 구현 완료.
 - **프로젝트/기능명**: [결제 정보와 저장한 값이 맞는지 검증 후 결제 요청 성공하면 결제가 승인된다.]
 - **진행한 작업**:
     - [O] 기능 개발: 
+    - tossPayment의 결제는 요청-> 인증 -> 승인 3가지로 이루어진다. 인증에 성공하면 paymentKey를 발급하여 url로 넘겨준다.
+1. 요청
+    - 결제 요청 전 tossOrderId, amount를 먼저 DB에 저장한다.
+    - `requestPayment` 결제 요청 메서드를 호출하기 전 `savePaymentRequest`를 호출하여 tossOrderId와 amount를 저장한다.
+```
+ async function savePaymentRequest(orderId,amount) {
+      const response = await fetch("/saveAmount", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: tossOrderId.textContent,
+          amount: totalDiningTablePrice,
+        }),
+      });
 
-1. tossOrderId의 발급 방식을 변경하였다.
-   - 원인 : UUID를 DB에 저장할때 생성하였는데 tossOrderId로 결제 정보를 찾아야 하는데 DB에 
+      if (!response.ok) {
+        throw new Error("Failed to save payment request.");
+      }
+    }
+
+    // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
+    button.addEventListener("click", async function () {
+
+
+      await savePaymentRequest(orderId,totalDiningTablePrice);
+
+      await widgets.requestPayment({
+        orderId: tossOrderId.textContent,
+        orderName: String(OrderName),
+        successUrl: window.location.origin + "/success",
+        failUrl: window.location.origin + "/fail",
+      });
+    });
+  }
+``` 
+
+2. 인증 
+
+<img src="READMEImages/7.결제%20정보%20검증.png">
+
+- 파라미터로 넘어온 paymentKey, orderId, amount를 받아 OrderId로 저장되어있는 정보를 찾아와 amount를 비교한다.
+- 결제 인증이 성공하면 PayStatus를 IN_PROGRESS로 인증 완료 상태로 바꿔준다.
+```java
+// Controller
+@GetMapping("/success")
+    public String verify(
+        @RequestParam String paymentKey,
+        @RequestParam String orderId,
+        @RequestParam int amount,
+        Model model
+        ){
+        tossWidgetService.verify(paymentKey, orderId, amount);
+
+        model.addAttribute("paymentKey", paymentKey);
+        model.addAttribute("orderId", orderId);
+        model.addAttribute("amount", amount);
+
+        return "/tossPay/success.html";
+    }
+// Service
+@Transactional
+public void verify(String paymentKey ,String orderId, int amount) {
+
+    Optional<Payment> paymentOptional = paymentRepository.findByTossOrderId(orderId);
+    Payment payment = paymentOptional.orElseThrow(
+        () -> new IllegalArgumentException("orderId로 찾을 수 없음"));
+
+    // amount가 Int여서 equals를 사용 불가 int는 기본 타입, Integer는 객체 타입
+    if(payment.getTotalAmount() != amount){
+        return;
+    }
     
+    // 결제 인증 완료로 변경
+    payment.updatePayStatus(PayStatus.IN_PROGRESS);
+
+    paymentRepository.save(payment);
+}
+```
+- 검증이 완료되면 status가 변경된다
+
+<img src="READMEImages/8.검증%20완료된%20DB.png">
+
+- 검증이 완료되면 Url`success?paymentType=orderId=&paymentKey=&amount=` 을 보내준다.
+
+<img src="READMEImages/11.성공%20시%20paymentKey,orderId,amount%20.png">
+
+- 결제 승인 페이지
+
+<img src="READMEImages/12.tossPyaments승인화면.png">
+
+3. 승인
+- /confirm을 호출하여 결제를 진행한다.
+```java
+// Controller
+    @RequestMapping(value = "/confirm")
+public ResponseEntity<JSONObject> confirmPayment(@RequestBody String jsonBody){
+    // 생략 ...
+        
+ Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
+        JSONObject jsonObject = (JSONObject) parser.parse(reader);
+        responseStream.close();
+
+        System.out.println("########## tossWidgetController confirm #################");
+        System.out.println("jsonObject = " + jsonObject);
+        System.out.println("########## tossWidgetController confirm #################");
+        tossWidgetService.successPayment(jsonObject);
+}
+
+// Service
+@Transactional
+public void successPayment(JSONObject jsonObject) {
+    PaymentSuccessDto paymentSuccessDto = mapDto(jsonObject);
+
+    Optional<Payment> paymentOptional = paymentRepository.findByTossOrderId(
+        paymentSuccessDto.getTossOrderId());
+    Payment payment = paymentOptional.orElseThrow(
+        () -> new IllegalArgumentException("orderId로 찾을 수 없음"));
+
+
+    payment.successPayment(paymentSuccessDto.getPaymentKey(),
+                           paymentSuccessDto.getPayType(),
+                           paymentSuccessDto.getTossOrderName(),
+                           PayStatus.DONE,
+                           paymentSuccessDto.getMethod(),
+                           paymentSuccessDto.getProvider(),
+                           paymentSuccessDto.getApprovedAt()
+    );
+
+    paymentRepository.save(payment);
+    System.out.println("########### 성공 ##############");
+}
+
+private PaymentSuccessDto mapDto(JSONObject jsonObject) {
+
+    JSONObject easyPay = (JSONObject) jsonObject.get("easyPay");
+    String provider = (String) easyPay.get("provider");
+
+
+    return PaymentSuccessDto.builder()
+        .paymentKey((String) jsonObject.get("paymentKey"))
+        .tossOrderId((String) jsonObject.get("orderId"))
+        .tossOrderName((String) jsonObject.get("orderName"))
+        .method((String) jsonObject.get("method"))
+        .provider(provider)
+        .payType(PayType.valueOf((String) jsonObject.get("type")))
+        .payStatus(PayStatus.valueOf((String) jsonObject.get("status")))
+        .approvedAt(OffsetDateTime.parse((String) jsonObject.get("approvedAt")).toString())
+        .build();
+}
+```
+
+- 넘어오는 데이터를 dto로 변환 후 데이터를 업데이트한다.
+  <img src="READMEImages/13.tossPayment결제성공.png">
+
+
+- 결제가 성공하면 Status: Done으로 변경
+<img src="READMEImages/14.tossPayment결제성공DB.png">
+
 
 ---
 
@@ -41,48 +197,68 @@ TossPaymets의 요청을 받고 검증 후 승인까지 구현 완료.
         }
 
 
-    @GetMapping("/tossPay/checkout/{currentName}")
-    public String GetTossPay(Model model, @PathVariable int currentName) {
-
-        DiningTableDto currentOrder = diningTableService.findTableOrder(currentName);
-        String tossOrderId = generateUniqueOrderId();
-        model.addAttribute("currentOrder", currentOrder);
-        model.addAttribute("getTotalDiningTablePrice", currentOrder.getTotalDiningTablePrice());
-        model.addAttribute("tossOrderId", tossOrderId);
-
-        return "/tossPay/checkout.html";
-    }
-        
+        @GetMapping("/tossPay/checkout/{currentName}")
+        public String GetTossPay(Model model, @PathVariable int currentName) {
+    
+            DiningTableDto currentOrder = diningTableService.findTableOrder(currentName);
+            String tossOrderId = generateUniqueOrderId();
+            model.addAttribute("currentOrder", currentOrder);
+            model.addAttribute("getTotalDiningTablePrice", currentOrder.getTotalDiningTablePrice());
+            model.addAttribute("tossOrderId", tossOrderId);
+    
+            return "/tossPay/checkout.html";
+        }
       }
 ```
+<img src="READMEImages/10.TossPay%20UUID%20변경%20후.png">
 
+- 바뀐 UUID의 저장된 모습이다.
 
 ### 🔍 오류 2
-- **오류 내용**: [발생한 오류에 대한 상세 설명]
-- **원인 분석**: [오류가 발생한 이유]
+- **오류 내용**: 요청시간, 승인 시간 저장중 문제 발생
+- **원인 분석**: mySql을 사용중이서 시간을 LocalDateTime으로 저장하고 있었는데 tossPayments는 zoneTiem을 포함해서 보내주고 있다. OffsetDateTime으로 보내주고 있다는것이다.
+하지만 mySql은 OffsetDateTime을 지원하지 않는다. 그래서 String으로 저장하기로 하였다.
 - **해결 방법**:
-    1. [해결 과정 1]
-    2. [해결 과정 2]
+    1. 결제 요청을 할 때 정보를 저장할때 LocalDateTime.now() 사용한 것을 formatter사용하여 변환 후 String으로 저장한다.
+```java
+public Payment toEntity() {
+
+    OffsetDateTime now = OffsetDateTime.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+    String formattedNow = now.format(formatter);
+
+    return Payment.builder()
+        .payStatus(PayStatus.READY)
+        .tossOrderId(orderId)
+        .totalAmount(amount)
+        .requestedAt(formattedNow)
+        .build();
+}
+```
+
+2. tossPayments에서 넘어온 시간은 offsetDateTime으로 받고 String으로 변환 후 넣어주면 된다.
+```
+.approvedAt(OffsetDateTime.parse((String) jsonObject.get("approvedAt")).toString())
+```
+
+<img src="READMEImages/15.String변환후%20DB.png">
 
 ---
 
 ## 3. 회고 📝
-오늘 작업에 대한 회고와 느낀 점, 개선할 점 등을 작성합니다.
+- TossPayments가 정말 친절한 Doucment라고 생각한다. 옛날 팀프로젝트를 할때 FullCalender API를 사용한적이 있었는데 정말 어려웠다.
+근데 tossPayments는 예제도 있고 자료도 많아서 좀 더 쉽게 구현할 수 있었다. 하지만 아직 부족한 부분이 많고 한번에 이해가 되지는 않는다.
+좀 더 Json부분과 Connection부분을 공부해봐야겠다.
 
-- **잘한 점**:
-    - [어떤 점에서 효율적이었는지, 만족스러웠는지 기록]
-- **아쉬운 점**:
-    - [개선해야 할 부분, 다음에 더 잘할 수 있는 부분 기록]
 - **앞으로의 계획**:
-    - [다음 작업에서 적용할 계획 또는 학습할 주제]
+    - 취소, 조회 구현 예정
 
 ---
 
 ## 🔗 참고 자료 📚
 작업 중 참고한 자료 또는 링크를 정리합니다.
-
-- [문서 링크나 블로그 포스트]
-- [레퍼런스 코드나 관련 강의]
+1. tossPayments
+- [https://docs.tosspayments.com/guides/v2/get-started/payment-flow#%EA%B2%B0%EC%A0%9C-%EC%A0%95%EB%B3%B4-%EA%B2%80%EC%A6%9D%ED%95%98%EA%B8%B0]
 
 ---
 
@@ -102,7 +278,8 @@ TossPaymets의 요청을 받고 검증 후 승인까지 구현 완료.
 
 
 1. TossPay에서 제시해주는 결제 흐름이다. 결제 요청전 결제금액 확인, 취소 등을 확인하기 위해 결제 정보를 저장하라고 제시한다.
-      <img src="/READMEImages/TossPay결제 흐름.png"/>
+
+<img src="/READMEImages/6.TossPay결제%20흐름.png"/>
 
 2. PayMent Entity, Enum(PayType, PayStatus), PaymentRequestDto, TossWidgetController, TossWidgetService, tossPay템플릿 구현
 3. PaymentRequestDto에서 저장하는 값을 Builder 패턴을 사용하여 amount 값 프론트에서 받아오고 TossPay Document의 규칙을 적용하여 OrderId는 UUID를 적용 시켰다.
@@ -128,10 +305,13 @@ TossPaymets의 요청을 받고 검증 후 승인까지 구현 완료.
         }
     ```
 4. POSTMAN에서 ResponseEntity.ok결과값 저장 성공이 잘 넘어 오고 있다.
-<img src="READMEImages/TossPay결제%20검증용%20PostMan.png">
+
+<img src="READMEImages/4.TossPay결제%20검증용%20PostMan.png">
 
 5. DB에도 잘 들어간다.
-<img src="READMEImages/TossPay결제%20검증용%20DB.png">
+
+<img src="READMEImages/5.TossPay결제%20검증용%20DB.png">
+
 ---
 
 ## 🔗 참고 자료 📚
@@ -418,7 +598,7 @@ Redis를 사용한 이메일 인증 기능 구현
             return new ItemDto(item.getId(), item.getName(), item.getPrice());
         }
     ```
-<img src="READMEImages/종합가격 구현한 스크린샷.png">
+<img src="READMEImages/1.종합가격 구현한 스크린샷.png">
 
 ### 구현단계이기 때문에 모든 데이터를 표시하고 있다.
 
@@ -517,7 +697,7 @@ public DiningTableDto findTableOrder(int name) {
 - 업데이트는 OrderItemId를 기준으로 업데이트하였다.
 
 
-<img src="READMEImages/주문업데이트 구현.png">
+<img src="READMEImages/2.주문업데이트 구현.png">
 
 ## 1.7
 ### 오류 발견
@@ -775,7 +955,7 @@ public ResponseEntity<Map<String, String>> addOrder(@RequestBody OrderDto orderD
 - 토스 poss를 벤치 마킹하였기 때문에 결제 시스템도 toss Pay를 사용하기로 하였다.
 - toss Pay의 결제 기능은 구현은 개발 문서에 아주 자세하게 설명되어 있고 샌드박스를 사용할 수 있어서 보다 편하게 구현이 가능하다.
 - 출처 : https://docs.tosspayments.com/guides/v2/payment-widget/integration?backend=java
-<img src="READMEImages/tosspay구현중.png">
+<img src="READMEImages/3.tosspay구현중.png">
 - 이제 데이터를 잘 가공하여서 다듬으면 된다.
 
 

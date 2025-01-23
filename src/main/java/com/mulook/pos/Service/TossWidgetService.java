@@ -6,12 +6,10 @@ import com.mulook.pos.entity.Enum.PayStatus;
 import com.mulook.pos.entity.Enum.PayType;
 import com.mulook.pos.entity.Payment;
 import com.mulook.pos.repository.PaymentRepository;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
