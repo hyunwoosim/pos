@@ -85,15 +85,11 @@ public class TossWidgetController {
         System.out.println("tossOrderId = " + tossOrderId);
         System.out.println("########WidgetController-currentOrder########");
 
-        String clientApiKey = tossPaymentConfig.getClientApiKey();
-        System.out.println("########WidgetController-currentOrder########");
-        System.out.println("clientApiKey = " + clientApiKey);
-        System.out.println("########WidgetController-currentOrder########");
 
         model.addAttribute("currentOrder", currentOrder);
         model.addAttribute("getTotalDiningTablePrice", currentOrder.getTotalDiningTablePrice());
         model.addAttribute("tossOrderId", tossOrderId);
-        model.addAttribute("clientApiKey", clientApiKey);
+
         return "/tossPay/checkout.html";
     }
 

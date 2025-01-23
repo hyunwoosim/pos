@@ -3,6 +3,89 @@
 
 # TIL (Today I Learned)
 
+## 📅 날짜: 01-23
+
+---
+
+## 1. 진행 상황 🛠️
+TossPaymets의 요청을 받고 검증 후 승인까지 구현 완료.
+
+- **프로젝트/기능명**: [결제 정보와 저장한 값이 맞는지 검증 후 결제 요청 성공하면 결제가 승인된다.]
+- **진행한 작업**:
+    - [O] 기능 개발: 
+
+1. tossOrderId의 발급 방식을 변경하였다.
+   - 원인 : UUID를 DB에 저장할때 생성하였는데 tossOrderId로 결제 정보를 찾아야 하는데 DB에 
+    
+
+---
+
+## 2. 오류 및 해결 방법 ⚠️
+작업 중에 발생한 오류와 이를 어떻게 해결했는지 기록합니다.
+
+### 🔍 오류 1
+- **오류 내용**: [결제 정보를 찾는 UUID 발급 방식 문제 발생]
+- **원인 분석**:
+    1. DB 저장 전 `.tossOrderId(UUID.randomUUID().toString())`로 `tossOrderId`를 발급하였는데 결제 정보를 tossOrderId로 찾기 때문에 DB저장 전에는 확인할 수가 없어 결제 검증을 할 수가 없다.
+    2. UUID의 중복 문제
+- **해결 방법**:
+    1. 서비스에서 랜덤UUID로 tossOrderId를 만들어서 넘겨주기로 결정하였다.
+    2. 중복문제 해결을 위해 현재시간 밀리초, 랜덤 문자를 사용하여 중복 방지
+```java
+      public class controller{
+              // tossOrderId로 사용할 랜덤 UUID 생성기
+         private String generateUniqueOrderId() {
+            String currentTime = String.valueOf(System.currentTimeMillis()); // 현재 시간을 밀리초로 가져옴
+            String randomString = UUID.randomUUID().toString().substring(0, 6); // 랜덤 문자열 일부만 사용 (예: 앞 6자리)
+            return "ORDER-" + currentTime + "-" + randomString; // "ORDER-<현재시간>-<랜덤문자열>"
+        }
+
+
+    @GetMapping("/tossPay/checkout/{currentName}")
+    public String GetTossPay(Model model, @PathVariable int currentName) {
+
+        DiningTableDto currentOrder = diningTableService.findTableOrder(currentName);
+        String tossOrderId = generateUniqueOrderId();
+        model.addAttribute("currentOrder", currentOrder);
+        model.addAttribute("getTotalDiningTablePrice", currentOrder.getTotalDiningTablePrice());
+        model.addAttribute("tossOrderId", tossOrderId);
+
+        return "/tossPay/checkout.html";
+    }
+        
+      }
+```
+
+
+### 🔍 오류 2
+- **오류 내용**: [발생한 오류에 대한 상세 설명]
+- **원인 분석**: [오류가 발생한 이유]
+- **해결 방법**:
+    1. [해결 과정 1]
+    2. [해결 과정 2]
+
+---
+
+## 3. 회고 📝
+오늘 작업에 대한 회고와 느낀 점, 개선할 점 등을 작성합니다.
+
+- **잘한 점**:
+    - [어떤 점에서 효율적이었는지, 만족스러웠는지 기록]
+- **아쉬운 점**:
+    - [개선해야 할 부분, 다음에 더 잘할 수 있는 부분 기록]
+- **앞으로의 계획**:
+    - [다음 작업에서 적용할 계획 또는 학습할 주제]
+
+---
+
+## 🔗 참고 자료 📚
+작업 중 참고한 자료 또는 링크를 정리합니다.
+
+- [문서 링크나 블로그 포스트]
+- [레퍼런스 코드나 관련 강의]
+
+---
+
 
 
 ## 📅 날짜: 01-21
