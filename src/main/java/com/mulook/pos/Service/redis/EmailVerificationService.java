@@ -24,7 +24,7 @@ public class EmailVerificationService {
     // 인증 토큰 생성
     public String generateVerificationToken(String email) {
 
-        // 6wkfl 랜덤 숫자 인증코드 생성
+        // 6자리 랜덤 숫자 인증코드 생성
         Random random = new Random();
         int code = 10000 + random.nextInt(9000000);
         String verificationCode = String.valueOf(code);
