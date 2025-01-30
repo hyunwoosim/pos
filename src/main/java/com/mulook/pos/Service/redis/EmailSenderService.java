@@ -9,14 +9,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EmailSenderService {
-
     /**
      * 이메일 전송 서비스
      */
-
     private final JavaMailSender mailSender;
-
-
 
     public void sendVerificationEmail(String toEmail, String code) {
         System.out.println("#########EmailSenderService########");

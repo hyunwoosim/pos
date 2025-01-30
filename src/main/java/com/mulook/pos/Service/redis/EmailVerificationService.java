@@ -29,12 +29,6 @@ public class EmailVerificationService {
         int code = 10000 + random.nextInt(9000000);
         String verificationCode = String.valueOf(code);
 
-        System.out.println("####### 인증 토큰 생성############");
-        System.out.println("code = " + code);
-        System.out.println("verificationCode = " + verificationCode);
-        System.out.println("####### 인증 토큰 생성############");
-
-
         // redis에 저장
         redisTemplate.opsForValue().set(verificationCode, email, expiryTime, TimeUnit.SECONDS);
 

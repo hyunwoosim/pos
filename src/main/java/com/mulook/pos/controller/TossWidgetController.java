@@ -63,6 +63,10 @@ public class TossWidgetController {
 
         return "/tossPay/success.html";
     }
+    @GetMapping("/fail")
+    public String fail() {
+        return "/tossPay/fail.html";
+    }
 
     @PostMapping("/saveAmount")
     public ResponseEntity<String> savePayment(@RequestBody PaymentRequestDto paymentRequestDto){

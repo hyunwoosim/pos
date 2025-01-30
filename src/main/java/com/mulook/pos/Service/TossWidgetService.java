@@ -29,7 +29,6 @@ public class TossWidgetService {
         Payment payment = paymentOptional.orElseThrow(
             () -> new IllegalArgumentException("orderId로 찾을 수 없음"));
 
-
         payment.successPayment(paymentSuccessDto.getPaymentKey(),
                                paymentSuccessDto.getPayType(),
                                paymentSuccessDto.getTossOrderName(),
@@ -65,6 +64,8 @@ public class TossWidgetService {
             System.out.println("##########verify Service ##########");
             System.out.println("저장된 결제 값과 최종 결제 값이 다르다");
             System.out.println("##########verify Service ##########");
+            throw new IllegalArgumentException("결제 금액 불일치: 저장된 금액 = "
+                                                   + payment.getTotalAmount() + ", 요청된 금액 = " + amount);
         }
         System.out.println("##########verify Service ##########");
         System.out.println("저장된 결제 값과 최종 결제 값이 같다");
