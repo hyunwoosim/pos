@@ -2,6 +2,7 @@ package com.mulook.pos.entity;
 
 import com.mulook.pos.entity.Enum.PayStatus;
 import com.mulook.pos.entity.Enum.PayType;
+import com.mulook.pos.entity.Enum.PaymentsCancelReason;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,6 +54,13 @@ public class Payment {
 
    // 결제 승인 시간
    private String approvedAt;
+
+   // 결제 취소 시간
+    private String canceledAt;
+
+    // 결제 취소 이유
+    @Enumerated(EnumType.STRING)
+    private PaymentsCancelReason cancelReason;
 
 
    // 비즈니스 로직
